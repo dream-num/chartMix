@@ -1,0 +1,9 @@
+export const ENABLE_ACTIVE = 'ENABLE_ACTIVE';
+export const DISABLE_ACTIVE = 'DISABLE_ACTIVE';
+export const UPDATE_CHART_ITEM = 'UPDATE_CHART_ITEM';
+
+export default {
+    ENABLE_ACTIVE,
+    DISABLE_ACTIVE,
+    UPDATE_CHART_ITEM,
+}

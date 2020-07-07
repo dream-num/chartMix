@@ -1,0 +1,95 @@
+<template>
+  <!-- 主标题设置 -->
+  <el-collapse-item name="1">
+    <template slot="title">
+      标题设置
+      <i class="iconfont icon-biaoti"></i>
+    </template>
+
+    <!-- 显示标题 -->
+    <chart-base-switch :switchValue.sync="title.show">
+      <div slot="title">显示主标题</div>
+    </chart-base-switch>
+
+    <!-- 标题内容 -->
+    <chart-base-input :inputValue.sync="title.text" :placeholder="'请输入标题内容'">
+      <div slot="input">主标题内容</div>
+    </chart-base-input>
+
+    <!-- 字体样式 -->
+    <chart-base-label :router="router + '/label'" :baseLabelOption.sync="title.label">
+      <div slot="title">文本样式</div>
+    </chart-base-label>
+
+    <!-- 标题位置 -->
+    <chart-base-select :selectOption="positionData" :selectValue.sync="title.position.value">
+      <div slot="select">主标题位置</div>
+    </chart-base-select>
+
+    <!-- 自定义位置 -->
+    <el-row v-if="title.position.value === 'custom'">
+      <!-- 左边距偏移量 -->
+      <chart-base-slider :baseSliderOption.sync="title.position.offsetX" :unit="'%'" :content="'滑动修改左边距偏移量'"></chart-base-slider>
+
+      <!--  上边距偏移量 -->
+      <chart-base-slider :baseSliderOption.sync="title.position.offsetY" :unit="'%'" :content="'滑动修改上边距偏移量'"></chart-base-slider>
+    </el-row>
+  </el-collapse-item>
+</template>
+
+<script>
+import * as t from '@/utils/importUtil'
+import { positionOption } from '@/data/chartJson'
+
+export default {
+  name: 'ChartTitle',
+  props: {
+    router: String,
+    chartAllType: String,
+    titleOption: Object
+  },
+  components: {
+    ...t.importComp(t)
+  },
+  data: function() {
+    return {
+      title: '', //整个title设置,
+      positionData: positionOption
+    }
+  },
+  watch: {
+    titleOption: {
+      handler: function(newVal , oldVal){
+          if(t.isEqual(this.title,newVal)){
+                return;
+          }
+          this.title = t.deepCopy(newVal)
+      },
+      deep: true,
+      immediate: true
+    },
+    title: {
+      handler: function(newVal , oldVal){
+        // 改变值就重新渲染
+        if(oldVal){
+          this.changeTitle()
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+  methods: {
+    ...t.mapActions('chartSetting' , ['updateChartItem']),
+    changeTitle(){
+      const updateObj = {
+        updateObj: t.deepCopy(this.title),
+        router: this.router,
+      }
+      this.updateChartItem(updateObj)
+    }
+  }
+}
+</script>
+
+<style></style>

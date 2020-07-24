@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import rect from './modules/rect'
 import chartRender from './modules/chartRender'
+import chartSetting from './modules/chartSetting'
 
 Vue.use(Vuex)
 
@@ -19,7 +20,8 @@ export default new Vuex.Store({
      */
     modules: {
         'rect':  rect,
-        'chartRender': chartRender
+        'chartRender': chartRender,
+        'chartSetting': chartSetting
     },
 
     /**

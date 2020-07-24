@@ -57,7 +57,7 @@
                     <chart-legend :router="'legend'" :chartAllType="currentChartType" :legendOption="legendOption"></chart-legend>
 
                     <!-- 坐标轴组件 -->
-                    <chart-axis :router="'axis'" :axisOption="axisOption" :chartAllType="currentChartType"></chart-axis>
+                    <chart-axis v-if="currentChartType.split('|')[1]!='pie'" :router="'axis'" :axisOption="axisOption" :chartAllType="currentChartType"></chart-axis>
 
                   </el-collapse>
                 </el-col>
@@ -100,6 +100,9 @@ export default {
         type: Object,
         default: null
       }
+    },
+    mounted(){
+      console.dir(this.chartOptions)
     },
     data() {
         return {

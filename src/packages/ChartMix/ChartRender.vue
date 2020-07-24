@@ -26,7 +26,7 @@ export default {
             if(this.active === true){
               this.renderCharts(chartOptions)
             }
-            
+            console.dir(JSON.stringify(chartOptions))
           },
           immediate: true,
           deep: true,

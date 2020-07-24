@@ -21,7 +21,6 @@ export default {
     ],
     // store current chart index
     currentChartIndex: null,
-
     // current chart objects, bind to chartSetting component
     // currentChart: {},
 };

@@ -39,7 +39,8 @@ const renderChart = function (renderChartObj, ele) {
     const { chart_id, chartOptions } = renderChartObj;
     const chartAllTypeArray = chartOptions.chartAllType.split('|');
     const chartPro = chartAllTypeArray[0];
-    const container = ele || document.getElementById(chart_id);
+    // const container = ele || document.getElementById(chart_id);
+    const container = document.getElementById(chart_id);
 
     if (chartPro === 'echarts') {
         const options = echartsEngine(chartOptions);

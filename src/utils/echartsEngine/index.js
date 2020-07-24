@@ -20,6 +20,7 @@ const echartsEngine = function (chartOptions) {
     const legendOption = transformLegend(chartAllTypeArray , chartOptions.defaultOption.legend)
     const tooltipOption = transformTooltip(chartAllTypeArray , chartOptions.defaultOption.tooltip)
     const axisOption = transformAxis(chartAllTypeArray , chartOptions.defaultOption.axis)
+    axisOption.xAxisDown.data = chartOptions.defaultOption.axis.xAxisDown.data
 
     const option = {
         title:{...titleOption},
@@ -27,26 +28,25 @@ const echartsEngine = function (chartOptions) {
             ...tooltipOption
         },
         legend: {
-            data: ['销量'],
             ...legendOption
         },
         xAxis: [{
-            data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
             ...axisOption.xAxisDown
         },{
-            data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
             ...axisOption.xAxisUp
         }],
         yAxis: [
             axisOption.yAxisLeft,
             axisOption.yAxisRight
         ],
-        series: [{
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-        }]
+        series: chartOptions.defaultOption.series
     };
+    // 饼图去掉XY轴
+    if(chartType == 'pie'){
+        delete option.xAxis
+        delete option.yAxis
+    }
+
     console.dir(option)
     console.dir(JSON.stringify(option))
     return option;

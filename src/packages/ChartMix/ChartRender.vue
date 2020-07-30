@@ -23,10 +23,10 @@ export default {
   watch: {
       chartOptions: {
           handler: function(chartOptions) {//此处必须使用function,不能用箭头函数
-            if(this.active === true){
-              this.renderCharts(chartOptions)
+            if(!chartOptions){
+              return 
             }
-            console.dir(JSON.stringify(chartOptions))
+              this.renderCharts(chartOptions)
           },
           immediate: true,
           deep: true,

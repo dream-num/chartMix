@@ -30,6 +30,11 @@ export default {
             select: '',
         }
     },
+    watch:{
+      selectValue(val){
+        this.select = val
+      }
+    },
     mounted(){
         this.select = this.selectValue
     },

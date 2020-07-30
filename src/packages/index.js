@@ -2,7 +2,7 @@
 import ChartSetting from './ChartMix/ChartSetting.vue'
 import chartSetting from '../store/modules/chartSetting'
 import ChartRender from './ChartMix/ChartRender.vue'
-import { initChart , createChart , highlightChart } from '../utils/exportUtil'
+import { initChart , createChart , highlightChart , deleteChart } from '../utils/exportUtil'
 
 // all components
 const components = [
@@ -50,7 +50,8 @@ export default {
     ...components,
     initChart,
     createChart,
-    highlightChart
+    highlightChart,
+    deleteChart
     // ChartSetting,
     // ChartRender
 }

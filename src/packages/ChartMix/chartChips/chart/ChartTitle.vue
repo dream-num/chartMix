@@ -54,14 +54,18 @@ export default {
   data: function() {
     return {
       title: '', //整个title设置,
-      positionData: positionOption
+      positionData: positionOption,
+      isChange: false
     }
   },
   watch: {
     titleOption: {
       handler: function(newVal , oldVal){
           if(t.isEqual(this.title,newVal)){
-                return;
+              return;
+          }
+          if(oldVal){
+            this.isChange = true
           }
           this.title = t.deepCopy(newVal)
       },
@@ -70,6 +74,10 @@ export default {
     },
     title: {
       handler: function(newVal , oldVal){
+        if(this.isChange){
+          this.isChange = !this.isChange
+          return
+        }
         // 改变值就重新渲染
         if(oldVal){
           this.changeTitle()

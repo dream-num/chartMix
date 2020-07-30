@@ -1,3 +1,4 @@
+import { baseComponent } from '@/data/chartJson'
 /**
  * 深度克隆数据,包括对象，数组，map
  * @param {*} obj 对象，数组，map
@@ -119,23 +120,6 @@ function generateRandomKey(prefix) {
     return prefix + '_' + mid + '_' + time
 }
 
-
-// 替换temp中的${xxx}为指定内容 ,temp:字符串，这里指html代码，dataarry：一个对象{"xxx":"替换的内容"}
-// 例：jfgrid.replaceHtml("${image}",{"image":"abc","jskdjslf":"abc"})   ==>  abc
-function replaceHtml(temp, dataarry) {
-    return temp.replace(/\$\{([\w]+)\}/g, function (s1, s2) { var s = dataarry[s2]; if (typeof (s) != "undefined") { return s; } else { return s1; } });
-}
-
-function hasChinaword(s) {
-    var patrn = /[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/gi;
-    if (!patrn.exec(s)) {
-        return false;
-    }
-    else {
-        return true;
-    }
-}
-
 function isdatetime(s) {
     if (s == null || s.toString().length < 5) {
         return false;
@@ -192,6 +176,16 @@ function isRealNum(val) {
         return true;
     } else {
         return false;
+    }
+}
+
+function hasChinaword(s) {
+    var patrn = /[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/gi;
+    if (!patrn.exec(s)) {
+        return false;
+    }
+    else {
+        return true;
     }
 }
 
@@ -368,11 +362,64 @@ function getRowColCheck(data) {
 
 function getRangeSplitArray(
     chartData,
+    rangeArray,
     rangeColCheck,
     rangeRowCheck
 ) {
-    var rangeSplitArray = {}
+    var rangeSplitArray = {};
     //生成类似excel的图表选区
+    if (rangeArray.length > 1) {
+        //上左、上右、下左、下右
+        rangeSplitArray = {
+            title: { row: [0, 0], column: [0, 0] },
+            rowtitle: { row: [0, 0], column: [1, chartData[0].length - 1] },
+            coltitle: { row: [1, chartData.length - 1], column: [0, 0] },
+            content: {
+                row: [1, chartData.length - 1],
+                column: [1, chartData[0].length - 1]
+            },
+            type: "multi",
+            range: rangeArray
+        };
+    }
+
+    //转置
+    //处理规则：根据不转置的情况，变换取值范围，coltitle和rowtitle交换，内部row和column交换，content的row和column交换，最后在getChartDataCache中转置整个区域数据时候取值时候即可取到正确范围的数据
+    // if(rangeConfigCheck){
+    // 	//上左、上右、下左、下右
+    // 	if (rangeColCheck.exits && rangeRowCheck.exits) {
+    // 		rangeSplitArray = {
+    // 			"title": { column: rangeRowCheck.range, row: rangeColCheck.range },
+    // 			"coltitle": { column: rangeRowCheck.range, row: [rangeColCheck.range[1] + 1, chartData[0].length - 1] },
+    // 			"rowtitle": { column: [rangeRowCheck.range[1] + 1, chartData.length - 1], row: rangeColCheck.range },
+    // 			"content": { column: [rangeRowCheck.range[1] + 1, chartData.length - 1], row: [rangeColCheck.range[1] + 1, chartData[0].length - 1] }, type: "normal", range: rangeArray[0]
+    // 		};
+    // 	}
+    // 	//左、右，没有行标题
+    // 	else if (rangeColCheck.exits) {
+    // 		rangeSplitArray = {
+    // 			"title": null,
+    // 			"coltitle": null,
+    // 			"rowtitle": { row: [0, chartData.length - 1], column: rangeColCheck.range },
+    // 			"content": { row: [0, chartData.length - 1], column: [rangeColCheck.range[1] + 1, chartData[0].length - 1] }, type: "leftright", range: rangeArray[0] };
+    // 	}
+    // 	//上、下，没有列标题
+    // 	else if (rangeRowCheck.exits) {
+    // 		rangeSplitArray = {
+    // 			"title": null,
+    // 			"coltitle": { row: rangeRowCheck.range, column: [0, chartData[0].length - 1] },
+    // 			"rowtitle": null,
+    // 			"content": { row: [rangeRowCheck.range[1] + 1, chartData.length - 1], column: [0, chartData[0].length - 1] }, type: "topbottom", range: rangeArray[0] };
+    // 	}
+    // 	//无标题，纯数据没有标题
+    // 	else {
+    // 		rangeSplitArray = {
+    // 			"title": null,
+    // 			"coltitle": null,
+    // 			"rowtitle": null,
+    // 			"content": { row: [0, chartData.length - 1], column: [0, chartData[0].length - 1] }, type: "contentonly", range: rangeArray[0] };
+    // 	}
+    // }else{ //不转置
     //上左、上右、下左、下右
     if (rangeColCheck.exits && rangeRowCheck.exits) {
         rangeSplitArray = {
@@ -389,8 +436,9 @@ function getRangeSplitArray(
                 row: [rangeRowCheck.range[1] + 1, chartData.length - 1],
                 column: [rangeColCheck.range[1] + 1, chartData[0].length - 1]
             },
-            type: 'normal',
-        }
+            type: "normal",
+            range: rangeArray[0]
+        };
     }
     //左、右，没有行标题
     else if (rangeColCheck.exits) {
@@ -406,8 +454,9 @@ function getRangeSplitArray(
                 row: [0, chartData.length - 1],
                 column: [rangeColCheck.range[1] + 1, chartData[0].length - 1]
             },
-            type: 'leftright',
-        }
+            type: "leftright",
+            range: rangeArray[0]
+        };
     }
     //上、下，没有列标题
     else if (rangeRowCheck.exits) {
@@ -423,8 +472,9 @@ function getRangeSplitArray(
                 row: [rangeRowCheck.range[1] + 1, chartData.length - 1],
                 column: [0, chartData[0].length - 1]
             },
-            type: 'topbottom',
-        }
+            type: "topbottom",
+            range: rangeArray[0]
+        };
     }
     //无标题，纯数据没有标题
     else {
@@ -436,12 +486,13 @@ function getRangeSplitArray(
                 row: [0, chartData.length - 1],
                 column: [0, chartData[0].length - 1]
             },
-            type: 'contentonly',
-        }
+            type: "contentonly",
+            range: rangeArray[0]
+        };
     }
     // }
     // console.dir(rangeSplitArray)
-    return rangeSplitArray
+    return rangeSplitArray;
 }
 
 //处理qk格式的数据返回原始值，###########需要完善日期获取############。
@@ -957,20 +1008,6 @@ function getChartDataCache(
         }
     }
 
-    // if(product=="echarts"){
-    // 	if(type=="line" || type=="column" || type=="area" || type=="scatter"){
-    // 		ret = {"chart"};
-    // 	}
-    // }
-    // else if(product=="highcharts"){
-
-    // }
-    // else if(product=="g2" || product=="g6"){
-
-    // }
-    // else if(product=="amcharts"){
-
-    // }
     return ret
 }
 
@@ -990,18 +1027,11 @@ function addDataToOption(
     chartPro,
     chartType,
     chartStyle,
+    chartData
 ) {
 
-    if (chartPro == 'echarts' && chartType == 'bar') {
-        defaultOptionIni.axis.yAxisLeft.data = chartDataCache.xAxis
-        defaultOptionIni.axis.yAxisLeft.type = 'category'
-        defaultOptionIni.axis.xAxisDown.type = 'value'
-    } else if (
-        !!chartDataCache.xAxis &&
-        chartStyle != 'polarStack' &&
-        !defaultOptionIni.firstShow &&
-        (chartType != 'radar' || chartPro == 'highcharts') &&
-        chartType != 'pie'
+    if (
+        !!chartDataCache.xAxis && chartType != 'bar'
     ) {
         //由于配置可能来自已经让用户配置过的项，所以为了不丢失选项，更新数据的时候需要进行判断。如果是象限数据为空、象限数据与需要更新的数据大小不一致，则全量更新。否则深入到每一项进行更新。以下同
         if (
@@ -1010,8 +1040,7 @@ function addDataToOption(
             defaultOptionIni.axis.xAxisDown.data.length != chartDataCache.xAxis.length
         ) {
             defaultOptionIni.axis.xAxisDown.data = chartDataCache.xAxis
-            defaultOptionIni.axis.xAxisDown.type = 'category'
-            defaultOptionIni.axis.yAxisLeft.type = 'value'
+
         } else {
             for (var i = 0; i < defaultOptionIni.axis.xAxisDown.data.length; i++) {
                 var cell = defaultOptionIni.axis.xAxisDown.data[i]
@@ -1022,36 +1051,35 @@ function addDataToOption(
                 }
             }
         }
+        defaultOptionIni.axis.xAxisDown.type = 'category'
+        defaultOptionIni.axis.yAxisLeft.type = 'value'
     }
 
     if (
-        !!chartDataCache.yAxis &&
-        chartStyle != 'polarStack' &&
-        !defaultOptionIni.firstShow &&
-        (chartType != 'radar' && chartPro == 'echarts')
+        chartPro == 'echarts' && chartType == 'bar'
     ) {
         if (
             defaultOptionIni.axis.yAxisLeft.data == null ||
             defaultOptionIni.axis.yAxisLeft.data.length == 0 ||
-            defaultOptionIni.axis.yAxisLeft.data.length != chartDataCache.yAxis
+            defaultOptionIni.axis.yAxisLeft.data.length != chartDataCache.xAxis.length
         ) {
-            defaultOptionIni.axis.yAxisLeft.data = chartDataCache.yAxis
-            defaultOptionIni.axis.yAxisLeft.type = 'category'
-            defaultOptionIni.axis.xAxisDown.type = 'value'
+            defaultOptionIni.axis.yAxisLeft.data = chartDataCache.xAxis
         } else {
             for (var i = 0; i < defaultOptionIni.axis.yAxisLeft.data.length; i++) {
                 var cell = defaultOptionIni.axis.yAxisLeft.data[i]
                 if (cell instanceof Object) {
-                    cell.value = chartDataCache.yAxis[i]
+                    cell.value = chartDataCache.xAxis[i]
                 } else {
-                    defaultOptionIni.axis.yAxisLeft.data[i] = chartDataCache.yAxis[i]
+                    defaultOptionIni.axis.yAxisLeft.data[i] = chartDataCache.xAxis[i]
                 }
             }
         }
+        defaultOptionIni.axis.yAxisLeft.type = 'category'
+        defaultOptionIni.axis.xAxisDown.type = 'value'
     }
 
     if (!!chartDataCache.series) {
-        
+
         // console.dir(chartDataCache)
         var seriesData = dataTranspose(
             dataChangeOrderTwo(chartDataCache.series, chartDataSeriesOrder)
@@ -1066,291 +1094,294 @@ function addDataToOption(
 
         // echarts默认所需初始数据格式
         if (chartType == 'pie') {
-            defaultOptionIni.legendData = legendData
-            defaultOptionIni.legend.data = []
-            // 图例data结构改动,变为对象形式
-            if (seriesData[0].length == 1) {
-                for (var i = 0; i < chartDataCache.label.length; i++) {
-                    defaultOptionIni.legend.data.push({
-                        name: chartDataCache.label[i],
-                        textStyle: { color: null },
-                        value: seriesData[i][0]
-                    })
-                }
-            } else {
-                for (var i = 0; i < chartDataCache.xAxis.length; i++) {
-                    defaultOptionIni.legend.data.push({
-                        name: chartDataCache.xAxis[i],
-                        textStyle: { color: null },
-                        value: seriesData[0][i]
-                    })
-                }
-            }
+            transformPie(defaultOptionIni, chartDataCache, seriesData, legendData, chartPro, chartType, chartStyle)
 
 
-            defaultOptionIni.series.length = 0
-            var seriesObj = {
-                name: legendData[0],
-                type: 'pie',
-                radius: ['0%', '75%'],
-                data: [],
-                dataLabels: {}
-            }
-            defaultOptionIni.series1Data = []
-            // 如果选一行
-            if (seriesData[0].length == 1) {
-                for (var i = 0; i < seriesData.length; i++) {
-                    defaultOptionIni.minus = []
-                    if (seriesData[i].toString().slice(0, 1) == '-') {
-                        defaultOptionIni.minus.push(i)
-                    }
-                    var value, name
-                    if (seriesData[i] > 0) {
-                        value = seriesData[i][0]
-                        name = legendData[i]
-                    } else if (seriesData[i] <= 0) {
-                        value = ''
-                        name = ''
-                    }
-                    seriesObj.data.push({
-                        value: value,
-                        name: name,
-                        label: {},
-                        labelLine: {
-                            lineStyle: {}
-                        },
-                        itemStyle: {}
-                    })
-                }
-                defaultOptionIni.series.push(seriesObj)
-            } else {
-                // 如果选多行
-                // console.dir(seriesData)
-                for (var i = 0; i < seriesData.length; i++) {
-                    if (i == 0) {
-                        for (var j = 0; j < seriesData[0].length; j++) {
-                            var value, name
-                            if (seriesData[0][j] > 0) {
-                                value = seriesData[0][j]
-                                name = chartDataCache.xAxis[j]
-                            } else if (seriesData[0][j] <= 0) {
-                                value = ''
-                                name = ''
-                            }
-                            seriesObj.data.push({
-                                value: value,
-                                name: name,
-                                label: {},
-                                labelLine: {
-                                    lineStyle: {}
-                                },
-                                itemStyle: {}
-                            })
-                        }
-                        defaultOptionIni.series.push(seriesObj)
-                    }
-                    // 如果是环形嵌套图,第二列为数据项
-                    if (i == 1) {
-                        defaultOptionIni.legend.name1 = defaultOptionIni.legendData[1]
-                        for (var a = 0; a < seriesData[1].length; a++) {
-                            var value, name
-                            if (seriesData[1][a] > 0) {
-                                value = seriesData[1][a]
-                                name = chartDataCache.xAxis[a]
-                            } else if (seriesData[1][a] <= 0) {
-                                value = ''
-                                name = ''
-                            }
-                            defaultOptionIni.series1Data.push({
-                                value: value,
-                                name: name,
-                                label: {},
-                                labelLine: {
-                                    lineStyle: {}
-                                },
-                                itemStyle: {}
-                            })
-                        }
-                    }
-                }
-            }
 
 
             // console.dir(defaultOptionIni)
-        } else {
-            if (
-                defaultOptionIni.series.length != seriesData.length &&
-                chartStyle != 'special'
-            ) {
-                defaultOptionIni.series = []
-            }
-            for (var i = 0; i < seriesData.length; i++) {
-                if (defaultOptionIni.series[i] == null) {
-                    defaultOptionIni.series[i] = {}
-                    defaultOptionIni.series[i].data = deepCopy(
-                        seriesData[i]
-                    )
-                    defaultOptionIni.series[i].type = chartType
-                    // 如果是echarts,并且是面积图,将type改为line
-                    if (chartPro == 'echarts' && chartType == 'area') {
-                        defaultOptionIni.series[i].type = 'line'
-                    } else if (chartPro == 'echarts' && chartType == 'column') {
-                        defaultOptionIni.series[i].type = 'bar'
-                    }
-                    defaultOptionIni.series[i].name = legendData[i]
-                    defaultOptionIni.series[i].markPoint = {}
-                    defaultOptionIni.series[i].markPoint.data = []
-                    defaultOptionIni.series[i].markLine = {}
-                    defaultOptionIni.series[i].markLine.data = []
-                    defaultOptionIni.series[i].markArea = {}
-                    defaultOptionIni.series[i].markArea.data = []
-                } else {
-                    if (
-                        defaultOptionIni.series[i].data == null ||
-                        defaultOptionIni.series[i].data.length == 0 ||
-                        defaultOptionIni.series[i].data.length != seriesData[i].length
-                    ) {
-                        defaultOptionIni.series[i].data = deepCopy(
-                            seriesData[i]
-                        )
-                        defaultOptionIni.series[i].name = legendData[i]
-                    } else {
-                        for (
-                            var a = 0;
-                            a < defaultOptionIni.series[i].data.length;
-                            a++
-                        ) {
-                            var cell = defaultOptionIni.series[i].data[a]
-                            if (cell instanceof Object) {
-                                cell.value = seriesData[i][a]
-                            } else {
-                                defaultOptionIni.series[i].data[a] = seriesData[i][a]
-                            }
-                        }
-                        defaultOptionIni.series[i].name = legendData[i]
-                    }
-                }
-            }
-
-            if (chartStyle == 'costComposition') {
-                if (defaultOptionIni.series.length > 1) {
-                    defaultOptionIni.series.splice(
-                        1,
-                        defaultOptionIni.series.length - 1
-                    )
-                }
-                var sum = 0
-                var sum1 = 0
-                for (var i = 0; i < defaultOptionIni.series[0].data.length; i++) {
-                    sum = sum + Number(defaultOptionIni.series[0].data[i])
-                }
-                var data2 = []
-                for (var j = 0; j < defaultOptionIni.series[0].data.length; j++) {
-                    sum1 = sum1 + Number(defaultOptionIni.series[0].data[j])
-                    data2.push(sum - sum1)
-                }
-                data2.unshift(0)
-                // defaultOptionIni.series[0].stack = '总量'
-                // defaultOptionIni.series[0].type = 'bar'
-                var series1obj = deepCopy(defaultOptionIni.series[0])
-                series1obj.data.unshift(sum)
-                if (series1obj.itemStyle) {
-                    delete series1obj.itemStyle
-                }
-                defaultOptionIni.series.push(series1obj)
-
-                defaultOptionIni.series[0].data = data2
-            }
-            if (chartPro == 'echarts' && chartType == 'bar') {
-                defaultOptionIni.seriesData = seriesData
-                // 第一个条形图系列的zindex置顶
-                defaultOptionIni.series[0].zlevel = 1
-                // 处理组件中的formatter数据
-                if (defaultOptionIni.config.option1) {
-                    defaultOptionIni.config.option1.data = seriesData
-                    // 大屏所需
-                    if (seriesData.length > 1) {
-                        var speArr = []
-                        for (var i = 0; i < seriesData[0].length; i++) {
-                            speArr.push((seriesData[0][i] / seriesData[1][i]) * 100)
-                        }
-                        defaultOptionIni.config.option1.speArr = speArr
-                    }
-                }
-
-            }
-
-            // 折线柱状图
-            if (chartStyle == 'linemix') {
-                if (defaultOptionIni.series.length > 1) {
-                    for (var j = 0; j < chartData[1].length; j++) {
-                        if (
-                            chartData[1][j] &&
-                            JSON.stringify(chartData[1][j]) != '{}' &&
-                            chartData[1][j].ct.fa.slice(-1) == '%'
-                        ) {
-                            // defaultOption.isPercent = true
-                            if (typeof chartData[1][0].v == 'string') {
-                                var data = defaultOptionIni.series[j - 1].data
-                                // defaultOptionIni.series[j-1].yAxisIndex = 1
-                            } else {
-                                var data = defaultOptionIni.series[j].data
-                                // defaultOptionIni.series[j].yAxisIndex = 1
-                            }
-                            for (var k = 0; k < data.length; k++) {
-                                data[k] *= 100
-                            }
-
-                        }
-                    }
-                }
-            }
-            // 如果有百分比数据乘以100
-            if (
-                (chartType == 'bar' || chartType == 'column') &&
-                chartStyle != 'special'
-            ) {
-                for (var j = 0; j < chartData[1].length; j++) {
-                    if (
-                        chartData[1][j] &&
-                        JSON.stringify(chartData[1][j]) != '{}' &&
-                        (chartData[1][j].ct.fa.slice(-1) == '%' ||
-                            chartData[1][j].m.slice(-1) == '%')
-                    ) {
-                        // 如果是移动端,并且是tab切换,不执行
-                        if (
-                            !(window.previewOption && window.previewOption.noChangeData)
-                        ) {
-                            if (
-                                typeof chartData[1][0].v == 'string' ||
-                                chartData[1][0].ct.fa == 'yyyy-MM-dd'
-                            ) {
-                                var data = defaultOptionIni.series[j - 1].data
-                            } else {
-                                var data = defaultOptionIni.series[j].data
-                            }
-                            for (var k = 0; k < data.length; k++) {
-                                data[k] *= 100
-                            }
-                        }
-                    }
-                }
-            }
+        } else if (chartType == 'line' || chartType == 'area' || chartType == 'bar' || chartType == 'column') {
+            transformCommon(defaultOptionIni, seriesData, legendData, chartPro, chartType, chartStyle)
         }
-
     }
 
     return defaultOptionIni
+}
+
+// transform common chart
+function transformCommon(defaultOptionIni, seriesData, legendData, chartPro, chartType, chartStyle) {
+    if (defaultOptionIni.series.length != seriesData.length) {
+        defaultOptionIni.series = []
+    }
+
+    for (var i = 0; i < seriesData.length; i++) {
+        if (defaultOptionIni.series[i] == null) {
+            defaultOptionIni.series[i] = initCommon(defaultOptionIni.series[i], seriesData[i], legendData[i], chartPro, chartType, chartStyle)
+        } else {
+            defaultOptionIni.series[i] = editCommon(defaultOptionIni.series[i], seriesData[i], legendData[i], chartPro, chartType, chartStyle)
+        }
+    }
+
+}
+
+// 初始化图表
+function initCommon(series, data, legendData, product, type, style) {
+    series = {
+        itemStyle: deepCopy(baseComponent.item),
+        lineStyle: deepCopy(baseComponent.lineStyle),
+        data,
+        type,
+        name: legendData,
+        markPoint: {
+            data: []
+        },
+        markLine: {
+            data: []
+        },
+        markArea: {
+            data: []
+        }
+    }
+    let actions = new Map([
+        ['line', initLine],
+        ['area', initArea],
+        ['bar', initBar],
+        ['column', initColumn]
+    ])
+    return actions.get(type)(series, data, legendData, product, type, style)
+}
+
+// 初始化折现图series
+function initLine(series, data, legendData, product, type, style) {
+    if (style == 'smooth') {
+        series.smooth = true
+    }
+    if (style == 'label') {
+        series.label = {
+            show: true,
+            formatter: '{c}',
+            fontSize: 10,
+            distance: 1
+        }
+    }
+    return series
+}
+
+// 初始化面积图
+function initArea(series, data, legendData, product, type, style) {
+    series.type = 'line'
+    series.areaStyle = {
+        normal: {}
+    }
+    if (style == 'stack') {
+        series.stack = '示例'
+    }
+    return series
+}
+
+// 初始化柱状图
+function initColumn(series, data, legendData, product, type, style) {
+    series.type = 'bar'
+    if (style == 'stack') {
+        series.stack = '示例'
+    }
+    return series
+}
+
+// 初始化条形图
+function initBar(series, data, legendData, product, type, style) {
+    if (style == 'stack') {
+        series.stack = '示例'
+    }
+    return series
+}
+
+// 编辑图表
+function editCommon(series, data, legendData, product, type, style) {
+    if (
+        series.data == null ||
+        series.data.length == 0 ||
+        series.data.length != data.length
+    ) {
+        series.data = data
+        series.name = legendData
+        series.type = type
+    } else {
+        for (var a = 0; a < series.data.length; a++) {
+            var cell = series.data[a]
+            if (cell instanceof Object) {
+                cell.value = data[a]
+            } else {
+                series.data[a] = data[a]
+            }
+        }
+        series.name = legendData
+        series.type = type
+    }
+    let actions = new Map([
+        ['line', editLine],
+        ['area', editArea],
+        ['bar', editBar],
+        ['column', editColumn]
+    ])
+    return actions.get(type)(series, data, legendData, product, type, style)
+}
+
+// 编辑折线图
+function editLine(series, data, legendData, product, type, style) {
+    return series
+}
+
+function editArea(series, data, legendData, product, type, style) {
+    series.type = 'line'
+    return series
+}
+
+function editBar(series, data, legendData, product, type, style) {
+    return series
+}
+
+function editColumn(series, data, legendData, product, type, style) {
+    series.type = 'bar'
+    return series
+}
+
+// 饼图series
+function transformPie(defaultOptionIni, chartDataCache, seriesData, legendData, chartPro, chartType, chartStyle) {
+    defaultOptionIni.legend.data = []
+    // 图例data结构改动,变为对象形式
+    for (var i = 0; i < chartDataCache.xAxis.length; i++) {
+        defaultOptionIni.legend.data.push({
+            name: chartDataCache.xAxis[i],
+            textStyle: { color: null },
+            value: seriesData[0][i]
+        })
+    }
+
+    for (var i = 0; i < seriesData.length; i++) {
+        if (i > 1) {
+            return
+        }
+        if (defaultOptionIni.series[i] == null) {
+            defaultOptionIni.series[i] = initPie(defaultOptionIni.series[i], chartDataCache, seriesData[i], legendData[i], chartPro, chartType, chartStyle)
+        } else {
+            defaultOptionIni.series[i] = editPie(defaultOptionIni.series[i], chartDataCache, seriesData[i], legendData[i], chartPro, chartType, chartStyle)
+        }
+    }
+}
+
+// 初始化饼图
+function initPie(series, chartDataCache, seriesData, legendData, product, type, style) {
+    let seriesObj = {
+        name: legendData,
+        type: 'pie',
+        radius: ['0%', '75%'],
+        data: [],
+        dataLabels: {},
+        seLabel: {},
+        seLine: {}
+    }
+
+    for (let j = 0; j < seriesData.length; j++) {
+        let value
+        let name
+        if (seriesData[j] > 0) {
+            value = seriesData[j]
+            name = chartDataCache.xAxis[j]
+        } else if (seriesData[j] <= 0) {
+            value = ''
+            name = ''
+        }
+        seriesObj.data.push({
+            value: value,
+            name: name,
+            label: {},
+            labelLine: {
+                lineStyle: {}
+            },
+            itemStyle: {}
+        })
+    }
+    series = seriesObj
+    series.roseType = false
+
+    // 分离型饼图
+    if (style == 'split') {
+        for (var j = 0; j < series.data.length; j++) {
+            series.data[j].selected = 'true'
+            series.data[j].selectedOffset = 5
+        }
+    }
+    // 圆环饼图
+    if (style == 'ring') {
+        series.radius = ['50%', '85%']
+        series.avoidLabelOverlap = false
+        series.label = {
+            normal: {
+                show: true,
+                position: 'outside'
+            },
+            emphasis: {
+                show: true,
+                textStyle: {
+                    fontSize: '16',
+                    fontWeight: 'bold'
+                }
+            }
+        }
+    }
+    return series
+}
+
+// 编辑饼图
+function editPie(series, chartDataCache, seriesData, legendData, chartPro, chartType, chartStyle) {
+    seires.name = legendData
+
+    // 如果原来的数据长度小于所选的数据长度
+    if (series.data.length < seriesData.length) {
+        for (let k = series.data.length; k < seriesData.length; k++) {
+            series.data.push({
+                value,
+                name,
+                y: value
+            })
+        }
+    }
+    // 如果原来的数据长度大于所选的数据长度,多余的部分数据为0,name为空
+    if (series.data.length > seriesData.length) {
+        for (let i = seriesData.length; i < series.data.length; i++) {
+            series.data[i].value = ''
+            series.data[i].y = ''
+            series.data[i].name = ''
+        }
+    }
+
+    for (let j = 0; j < seriesData.length; j++) {
+        let value
+        let name
+        if (seriesData[j] > 0) {
+            value = +seriesData[j]
+            name = chartDataCache.xAxis[j]
+        } else if (seriesData[j] <= 0) {
+            value = ''
+            name = ''
+        }
+
+        series.data[j].name = name
+        series.data[j].value = value
+        series.data[j].y = value
+    }
+    return series
 }
 
 export {
     deepCopy,
     deepClone,
     generateRandomKey,
-    replaceHtml,
     getRowColCheck,
     getRangeSplitArray,
     getChartDataCache,
     getChartDataSeriesOrder,
-    addDataToOption
+    addDataToOption,
+    transformCommon
 }

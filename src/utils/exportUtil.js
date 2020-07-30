@@ -1,9 +1,12 @@
 import store from '../store'
 import Vue from 'vue'
-import { generateRandomKey, deepCopy, replaceHtml, getRowColCheck, getRangeSplitArray, getChartDataCache , getChartDataSeriesOrder , addDataToOption } from '../utils/util'
+import { generateRandomKey, deepCopy, getRowColCheck, getRangeSplitArray, getChartDataCache , getChartDataSeriesOrder , addDataToOption } from '../utils/util'
 import { chartOptions } from '../data/chartJson'
 
-function initChart(outDom) {
+const ChartSetting = store.state.chartSetting
+
+// init chart
+function initChart(outDom , lang) {
     let dom = document.createElement('div')
     dom.id = 'chartmix'
     outDom.appendChild(dom);
@@ -11,23 +14,35 @@ function initChart(outDom) {
     new Vue({
         el: '#chartmix',
         store,
-        computed: {
-            chartOptions() {
-                if (!store.state.chartSetting.currentChartIndex) {
-                    return null
-                }
-                return store.state.chartSetting.chartLists[store.state.chartSetting.currentChartIndex].chartOptions
+        data(){
+            return{
+                lang
             }
         },
-        template: `<ChartSetting :chartOptions="chartOptions"></ChartSetting>`
+        computed: {
+            chartOptions() {
+                if (!ChartSetting.currentChartIndex) {
+                    return null
+                }
+                return ChartSetting.chartLists[ChartSetting.currentChartIndex].chartOptions
+            }
+        },
+        template: `<ChartSetting :lang="lang" :chartOptions="chartOptions"></ChartSetting>`
     })
 
 }
 
-// 创建图表,返回dom便于后续操作
-function createChart(outDom, chartData) {
+/**
+ * 
+ * @param {*} render 插入图表的容器
+ * @param {*} chartData 框选的数据
+ * @param {*} chart_id 图表ID
+ * 返回容器/id/chart_json图表配置
+ */
+function createChart(render, chartData, chart_id, rangeArray, rangeTxt) {
 
-    let chart_id = generateRandomKey('chart')
+    let chart_Id = chart_id ? chart_id : generateRandomKey('chart')
+    render.id = chart_Id
 
     chartOptions.defaultOption.series = []
 
@@ -39,73 +54,74 @@ function createChart(outDom, chartData) {
         chartOptions.chartAllType = 'echarts|line|default'
     }
 
-    // 生成图表数据机构
-    let chartOption = insertNewChart(chartOptions , chart_id , chartOptions.chartAllType , chartData)
+    // 生成图表数据结构
+    let chartOption = insertNewChart(chartOptions , chart_Id , chartOptions.chartAllType , chartData , rangeArray, rangeTxt)
 
     let renderDom = document.createElement('div')
-    renderDom.id = 'render' + chart_id
+    renderDom.id = 'render' + chart_Id
+    render.appendChild(renderDom)
 
-    let modelChartShowHTML =
-        '<div id="${id}"class="jfgrid-modal-dialog jfgrid-modal-dialog-chart ${addclass}"tabindex="0"role="dialog"aria-labelledby=":41e"dir="ltr"><div class="jfgrid-modal-dialog-resize"><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-lt"data-type="lt"></div><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-mt"data-type="mt"></div><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-lm"data-type="lm"></div><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-rm"data-type="rm"></div><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-rt"data-type="rt"></div><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-lb"data-type="lb"></div><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-mb"data-type="mb"></div><div class="jfgrid-modal-dialog-resize-item jfgrid-modal-dialog-resize-item-rb"data-type="rb"></div></div><div class="jfgrid-modal-dialog-controll"><span class="jfgrid-modal-controll-btn jfgrid-modal-controll-update"role="button"tabindex="0"aria-label="修改图表"title="修改图表"><i class="fa fa-pencil"aria-hidden="true"></i></span><span class="jfgrid-modal-controll-btn jfgrid-modal-controll-max"role="butjfgrid_chartIns_indexton"tabindex="0"aria-label="最大化"title="最大化"><i class="fa fa-window-maximize"aria-hidden="true"></i></span><span class="jfgrid-modal-controll-btn jfgrid-modal-controll-del"role="button"tabindex="0"aria-label="删除"title="删除"><i class="fa fa-trash"aria-hidden="true"></i></span></div><div class="jfgrid-modal-dialog-content">${content}</div></div>'
-
-    let chart_id_c = chart_id + '_c'
-
-    let $t = $(
-        replaceHtml(modelChartShowHTML, {
-            id: chart_id_c,
-            addclass: 'jfgrid-data-visualization-chart',
-            title: '图表生成',
-            content: ''
-        })
-    ).appendTo($(outDom))
-
-    $t.find('.jfgrid-modal-dialog-content').attr('id', chart_id)
-
-    $('.jfgrid-modal-dialog-content').append(renderDom)
-
-    store.state.chartSetting.currentChartIndex = store.state.chartSetting.chartLists.length
-    store.state.chartSetting.chartLists.push({
-        'chart_id': chart_id,
+    // 插入store和export出去的配置
+    let chart_json = {
+        'chart_id': chart_Id,
         'active': true,
         'chartOptions': deepCopy(chartOption)
+    }
+
+    store.commit('UPDATE_CHART_ITEM_ONE' , {
+        key: 'currentChartIndex',
+        value: ChartSetting.chartLists.length
     })
+
+    // ChartSetting.currentChartIndex = ChartSetting.chartLists.length
+    ChartSetting.chartLists.push(chart_json)
 
     console.dir(chartOption)
 
     new Vue({
-        el: '#render' + chart_id,
+        el: '#render' + chart_Id,
         store,
         data() {
             return {
-                chart_id
+                chart_Id
             }
         },
         computed: {
             options() {
-                console.dir(this.chart_id)
-                return store.state.chartSetting.chartLists.find(item => item.chart_id == this.chart_id).chartOptions
+                let chartJson = ChartSetting.chartLists.find(item => item.chart_id == this.chart_Id)
+                if(chartJson){
+                    return chartJson.chartOptions
+                }else{
+                    return null
+                }
             },
             active() {
-                return store.state.chartSetting.chartLists.find(item => item.chart_id == this.chart_id).active
+                let chartJson = ChartSetting.chartLists.find(item => item.chart_id == this.chart_Id)
+                if(chartJson){
+                    return chartJson.active
+                }else{
+                    return null
+                }
             }
         },
-        template: `<ChartRender :chartOptions="options" :chart_id="chart_id" :active="active"></ChartRneder>`
+        template: `<ChartRender :chartOptions="options" :chart_id="chart_Id" :active="active"></ChartRneder>`
     })
 
-    let render = document.getElementById(chart_id)
-    let container = document.getElementById(chart_id + '_c')
     return {
-        container,
-        render
+        render,
+        chart_Id,
+        chart_json
     }
 }
 
-// insertChart
+// insert chart
 function insertNewChart (
     chartOptions,
     chart_id,
     chartAllType,
     chartData,
+    rangeArray,
+    rangeTxt,
     chartTheme,
     height,
     width,
@@ -135,6 +151,8 @@ function insertNewChart (
     var defaultOptionIni = chartOptions.defaultOption
     //数据的sheet索引
     chart_json.chartData = chartData
+    chart_json.rangeArray = rangeArray
+    chart_json.rangeTxt = rangeTxt
 
     //根据数据集得到按钮状态，rangeColCheck表示首列是否标题，rangeRowCheck表示首行是否标题，rangeConfigCheck表示是否转置。
     var rowColCheck = getRowColCheck(chartData)
@@ -149,6 +167,7 @@ function insertNewChart (
     //按照数据范围文字得到具体数据范围
     var rangeSplitArray = getRangeSplitArray(
       chartData,
+      rangeArray,
       rangeColCheck,
       rangeRowCheck
     )
@@ -191,14 +210,33 @@ function insertNewChart (
 }
 
 // highlight current chart
-function highlightChart(id){
-    let index = store.state.chartSetting.chartLists.findIndex(item => item.chart_id == id)
-    store.state.chartSetting.currentChartIndex = index
+function highlightChart(chart_id){
+    let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
+    ChartSetting.currentChartIndex = index
 }
 
+// resize chart
+function resizeChart(chart_id){
+
+}
+
+// delete chart
+function deleteChart(chart_id){
+    let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
+    ChartSetting.chartLists.splice(index , 1)
+    ChartSetting.currentChartIndex--
+    if(ChartSetting.currentChartIndex < 0){
+        if(ChartSetting.chartLists[0]){
+            ChartSetting.currentChartIndex = 0
+            return
+        }
+        ChartSetting.currentChartIndex = null
+    }
+}
 
 export {
     initChart,
     createChart,
-    highlightChart
+    highlightChart,
+    deleteChart
 }

@@ -25,6 +25,11 @@ export default {
       switchData: false
     }
   },
+  watch:{
+    switchValue(val){
+      this.switchData = val
+    }
+  },
   mounted() {
     this.switchData = this.switchValue ? this.switchValue : false
   },

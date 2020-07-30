@@ -39,7 +39,11 @@ const echartsEngine = function (chartOptions) {
             axisOption.yAxisLeft,
             axisOption.yAxisRight
         ],
-        series: chartOptions.defaultOption.series
+        series: chartOptions.defaultOption.series ? chartOptions.defaultOption.series : [{
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        }]
     };
     // 饼图去掉XY轴
     if(chartType == 'pie'){

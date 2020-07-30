@@ -1,4 +1,6 @@
+import { getChartDataCache, getRangeSplitArray, getChartDataSeriesOrder, addDataToOption, deepCopy } from '../utils/util'
 import echartsEngine from '@/utils/echartsEngine/index'
+import store from '../store'
 // import highchartsEngine from './highchartsEngine'
 const echarts = require('echarts');
 
@@ -61,7 +63,7 @@ const renderChart = function (renderChartObj, ele) {
 /**
  * textStyle转化
  */
-const transTextStyle = function(origin , result , attr , attr1){
+const transTextStyle = function (origin, result, attr, attr1) {
     // fontGroup
     let fontGroupList = ['bold', 'vertical', 'italic'];
     origin.label.fontGroup.forEach(element => {
@@ -83,19 +85,19 @@ const transTextStyle = function(origin , result , attr , attr1){
     // fontColor
     result[attr].color = origin.label.color
     // fontSize
-    result[attr].fontSize = transCustom(origin.label.fontSize , origin.label.cusFontSize)
+    result[attr].fontSize = transCustom(origin.label.fontSize, origin.label.cusFontSize)
 }
 
 // 解决精度
-const floatTool = function() {
-    
+const floatTool = function () {
+
     /*
      * 判断obj是否为一个整数
      */
     function isInteger(obj) {
         return Math.floor(obj) === obj;
     }
-    
+
     /*
      * 将一个浮点数转成整数，返回整数和倍数。如 3.14 >> 314，倍数是 100
      * @param floatNum {number} 小数
@@ -103,25 +105,25 @@ const floatTool = function() {
      *   {times:100, num: 314}
      */
     function toInteger(floatNum) {
-        var ret = {times: 1, num: 0};
+        var ret = { times: 1, num: 0 };
 
         if (isInteger(floatNum)) {
             ret.num = floatNum;
             return ret;
         }
 
-        var strfi  = floatNum + '';
+        var strfi = floatNum + '';
         var dotPos = strfi.indexOf('.');
-        var len    = strfi.substr(dotPos + 1).length;
-        var times  = Math.pow(10, len);
+        var len = strfi.substr(dotPos + 1).length;
+        var times = Math.pow(10, len);
         var intNum = parseInt(floatNum * times + 0.5, 10);
 
-        ret.times  = times;
-        ret.num    = intNum;
+        ret.times = times;
+        ret.num = intNum;
 
         return ret;
     }
-    
+
     /*
      * 核心方法，实现加减乘除运算，确保不丢失精度
      * 思路：把小数放大为整数（乘），进行算术运算，再缩小为小数（除）
@@ -146,10 +148,10 @@ const floatTool = function() {
             case 'add':
                 if (t1 === t2) { // 两个小数位数相同
                     result = n1 + n2;
-                } 
+                }
                 else if (t1 > t2) { // o1 小数位 大于 o2
                     result = n1 + n2 * (t1 / t2);
-                } 
+                }
                 else { // o1 小数位 小于 o2
                     result = n1 * (t2 / t1) + n2;
                 }
@@ -158,10 +160,10 @@ const floatTool = function() {
             case 'subtract':
                 if (t1 === t2) {
                     result = n1 - n2;
-                } 
+                }
                 else if (t1 > t2) {
                     result = n1 - n2 * (t1 / t2);
-                } 
+                }
                 else {
                     result = n1 * (t2 / t1) - n2;
                 }
@@ -169,17 +171,17 @@ const floatTool = function() {
                 return result / max;
             case 'multiply':
                 result = (n1 * n2) / (t1 * t2);
-                
+
                 return result;
             case 'divide':
-                return result = function() {
+                return result = function () {
                     var r1 = n1 / n2;
                     var r2 = t2 / t1;
                     return operation(r1, r2, 'multiply');
                 }();
         }
     }
-    
+
     // 加减乘除的四个接口
     function add(a, b) {
         return operation(a, b, 'add');
@@ -193,7 +195,7 @@ const floatTool = function() {
     function divide(a, b) {
         return operation(a, b, 'divide');
     }
-    
+
     // exports
     return {
         add: add,
@@ -206,25 +208,154 @@ const floatTool = function() {
 /**
  * lineStyle转化
  */
-const transLineStyle = function (width , color , type='solid'){
+const transLineStyle = function (width, color, type = 'solid') {
     return {
         width,
         color,
-        type 
+        type
     }
 }
 
 /**
  自定义* custom数据
  */
-const transCustom = function (a , b){
-    if(a != 'custom'){
+const transCustom = function (a, b) {
+    if (a != 'custom') {
         return a
-    }else{
+    } else {
         return b
     }
 }
 
+// changecharttype
+const changeChangeAllType = function (chart_json, chartAllType) {
+    var chartID = chart_json.chart_id;
+    var chart_id = chartID;
+
+    var updateJson = {};
+
+    var chartAllTypeArray = chartAllType.split("|");
+    var chartPro = chartAllTypeArray[0],
+        chartType = chartAllTypeArray[1],
+        chartStyle = chartAllTypeArray[2];
+
+    updateJson.chart_id = chart_id;
+    updateJson.chartAllType = chartAllType;
+
+    //按照图表类型得到图表的默认设置
+    var defaultOptionIni = chart_json.defaultOption
+    defaultOptionIni.series = []
+
+    //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
+    var chartDataCache = getChartDataCache(
+        chart_json.chartData,
+        chart_json.rangeSplitArray,
+        chartPro,
+        chartType,
+        chartStyle
+    );
+    // console.dir(chartDataCache)
+    updateJson.chartDataCache = chartDataCache;
+
+    //生成默认的系列顺序，默认根据series数组的位置，用户可以在界面上操作更改这个位置。
+    var chartDataSeriesOrder = getChartDataSeriesOrder(
+        chartDataCache.series[0].length
+    );
+    updateJson.chartDataSeriesOrder = chartDataSeriesOrder;
+
+    //根据图表的默认设置、图表数据、图表系列顺序，等到一个完整的图表配置串。
+    var defaultOption = addDataToOption(
+        defaultOptionIni,
+        chartDataCache,
+        chartDataSeriesOrder,
+        chartPro,
+        chartType,
+        chartStyle,
+        chart_json.chartData
+    );
+
+    updateJson.defaultOption = defaultOption;
+
+    store.dispatch('chartSetting/updateChartItemChartlist', updateJson)
+
+    renderChart({ chartOptions: updateJson, chart_id: 'chart_a_001' })
+}
+
+// 行/列标题操作以及转置操作
+const checkCurrentBoxChange = function (chart_id, rangeRowCheck, rangeColCheck, rangeConfigCheck) {
+    var state = store.state;
+
+    var updateJson = deepCopy(state.chartSetting.chartLists[state.chartSetting.currentChartIndex].chartOptions) //原来的json
+    updateJson.chart_id = chart_id;
+    updateJson.rangeRowCheck = rangeRowCheck;
+    updateJson.rangeColCheck = rangeColCheck;
+    updateJson.rangeConfigCheck = rangeConfigCheck;
+
+    updateJson.chartData = updateJson.chartData || []
+
+    updateJson.rangeSplitArray = getRangeSplitArray(
+        updateJson.chartData,
+        updateJson.rangeArray,
+        rangeColCheck,
+        rangeRowCheck
+    );
+
+    var chartAllTypeArray = updateJson.chartAllType.split("|");
+    var chartPro = chartAllTypeArray[0],
+        chartType = chartAllTypeArray[1],
+        chartStyle = chartAllTypeArray[2];
+
+    updateJson.chartDataCache = getChartDataCache(
+        updateJson.chartData,
+        updateJson.rangeSplitArray,
+        chartPro,
+        chartType,
+        chartStyle,
+        rangeConfigCheck
+    ); //处理转置
+    updateJson.chartDataSeriesOrder = getChartDataSeriesOrder(
+        updateJson.chartDataCache.series[0].length
+    );
+
+    updateJson.defaultOption = addDataToOption(
+        updateJson.defaultOption,
+        updateJson.chartDataCache,
+        updateJson.chartDataSeriesOrder,
+        chartPro,
+        chartType,
+        chartStyle
+    )
+
+    store.dispatch('chartSetting/updateChartItemChartlist', updateJson)
+
+    renderChart({ chartOptions: updateJson, chart_id: 'chart_a_001' })
+}
+
+//系列数据顺序变化
+const changeSeriesOrder = function (chart_json, chartDataSeriesOrder) {
+    if (chart_json == null) {
+        return;
+    }
+
+    var chartID = chart_json.chart_id;
+
+    var chartAllTypeArray = chart_json.chartAllType.split("|");
+    var chartPro = chartAllTypeArray[0],
+        chartType = chartAllTypeArray[1],
+        chartStyle = chartAllTypeArray[2];
+
+    chart_json.defaultOption = addDataToOption(
+        chart_json.defaultOption,
+        chart_json.chartDataCache,
+        chartDataSeriesOrder,
+        chartPro,
+        chartType,
+        chartStyle
+    );
+
+    store.dispatch('chartSetting/updateChartItemChartlist', chart_json)
+    renderChart({ chartOptions: updateJson, chart_id: 'chart_a_001' })
+}
 
 export {
     setChartOptionsByRouter,
@@ -232,5 +363,8 @@ export {
     transTextStyle,
     floatTool,
     transLineStyle,
-    transCustom
+    transCustom,
+    changeChangeAllType,
+    checkCurrentBoxChange,
+    changeSeriesOrder
 }

@@ -2,9 +2,13 @@ import {
     ENABLE_ACTIVE,
     DISABLE_ACTIVE,
     UPDATE_CHART_ITEM,
+    UPDATE_CHART_ITEM_CHARTLIST,
+    UPDATE_CHART_ITEM_ONE,
+    UPDATE_CHART_ITEM_CHARTLIST_ONE,
     IS_UPDATE
 } from './mutation-types';
 import { setChartOptionsByRouter } from '@/utils/chartUtil';
+import $ from 'jquery'
 
 export default {
     [ENABLE_ACTIVE](state, id) {
@@ -32,5 +36,28 @@ export default {
         const currentChartOptions = state.chartLists[state.currentChartIndex].chartOptions;
 
         setChartOptionsByRouter(currentChartOptions,router , updateObj); //更新到子对象
+    },
+    /**
+     * 修改state中chartlist
+     */
+    [UPDATE_CHART_ITEM_CHARTLIST](state , params){
+        // let index = state.chartLists.findIndex(item => item.chart_id == params.chart_id)
+        let index = 0
+        state.chartLists[index].chartOptions = $.extend(state.chartLists[index].chartOptions , params)
+    },
+    /**
+     * 
+     * 修改state中chartlist中chartoptions的某一项
+     */
+    [UPDATE_CHART_ITEM_CHARTLIST_ONE](state , params){
+        // let index = state.chartLists.findIndex(item => item.chart_id == params.chart_id)
+        let index = 0
+        state.chartLists[index].chartOptions[params.key] = params.value
+    },
+    /**
+     * 修改state中其他
+     */
+    [UPDATE_CHART_ITEM_ONE](state , item){
+        state[item.key] = item.value
     }
 };

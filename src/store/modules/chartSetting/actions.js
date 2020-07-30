@@ -16,5 +16,14 @@ export default {
     },
     updateChartItem({commit}, updateObj) {
         commit(types.UPDATE_CHART_ITEM, updateObj);
+    },
+    updateChartItemChartlist({commit} , params){
+        commit(types.UPDATE_CHART_ITEM_CHARTLIST , params)
+    },
+    updateChartItemOne({commit} , item){
+        commit(types.UPDATE_CHART_ITEM_ONE , item)
+    },
+    updateChartItemChartlistOne({commit} , params){
+        commit(types.UPDATE_CHART_ITEM_CHARTLIST_ONE , params)
     }
 };

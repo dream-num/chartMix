@@ -36,16 +36,16 @@
             <el-tab-pane label="ToolBar" name="ToolBar">
                 <ToolBar ></ToolBar>
             </el-tab-pane>
-            <el-tab-pane label="ChartSetting" name="ChartSetting">
+            <el-tab-pane label="ChartSetting" name="ChartSetting" style="height: 500px;">
                 <div class="chartsetting-container">
                     <ChartSetting :chartOptions="currentChartOptions" ></ChartSetting>
                 </div>
             </el-tab-pane>
-            <el-tab-pane label="ChartList" name="ChartList">
+            <!-- <el-tab-pane label="ChartList" name="ChartList">
                 <div class="chartsetting-container">
                     <ChartSetting :chartOptions="currentChartOptions" ></ChartSetting>
                 </div>
-            </el-tab-pane>
+            </el-tab-pane> -->
         </el-tabs>
         
     </div>

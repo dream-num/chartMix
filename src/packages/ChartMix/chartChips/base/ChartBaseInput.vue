@@ -35,6 +35,11 @@ export default {
       input: ''
     }
   },
+  watch: {
+    inputValue(val){
+      this.input = val
+    }
+  },
   mounted() {
     this.input = this.inputValue ? this.inputValue : ''
   },

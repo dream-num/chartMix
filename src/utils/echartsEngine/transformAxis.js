@@ -1,6 +1,7 @@
 /**
  * 坐标轴转换
  */
+import $ from 'jquery'
 import { transTextStyle , transLineStyle , floatTool ,transCustom } from '@/utils/chartUtil'
 import { deepCopy } from '@/utils/util'
 const transformAxis = function(chartAllTypeArray , axis){
@@ -61,7 +62,8 @@ const transformAxis = function(chartAllTypeArray , axis){
     }
 
     let transAxis = function(res , ori){
-        let origin = axis[ori]
+        let origin = deepCopy(axis[ori])
+        res = $.extend(res , origin)
         // axis.show
         res.show = origin.show
         // axis.name
@@ -72,7 +74,9 @@ const transformAxis = function(chartAllTypeArray , axis){
         // 反向坐标轴
         res.inverse = origin.inverse
         // 坐标轴间隔个数
-        res.interval = origin.tickLabel.optimize
+        if(res.type != 'value'){
+            res.interval = origin.tickLabel.optimize
+        }
         // 标题与轴线距离
         res.nameGap = origin.title.rotate
         // 刻度线设置

@@ -66,6 +66,11 @@ export default {
       baseSliderData: 12
     };
   },
+  watch:{
+    baseSliderOption(val){
+      this.baseSliderData = val
+    }
+  },
   mounted() {
     this.baseSliderData = this.baseSliderOption;
   },

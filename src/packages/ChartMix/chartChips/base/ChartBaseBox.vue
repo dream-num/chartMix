@@ -23,6 +23,11 @@ export default {
             boxValue: ''
         }
     },
+    watch: {
+        boxData(val){
+            this.boxValue = val
+        }
+    },
     mounted(){
         this.boxValue = this.boxData ? deepCopy(this.boxData) : []
     },

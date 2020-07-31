@@ -2,6 +2,7 @@
 import ChartSetting from './ChartMix/ChartSetting.vue'
 import chartSetting from '../store/modules/chartSetting'
 import ChartRender from './ChartMix/ChartRender.vue'
+import { initChart , createChart , renderChart , highlightChart , deleteChart,  insertToStore , resizeChart , changeChartRange , changeChartCellData , getChartJson } from '../utils/exportUtil'
 
 // all components
 const components = [
@@ -46,5 +47,17 @@ export default {
     // must use install function
     install,
     // components list
-    ...components
+    ...components,
+    initChart,
+    createChart,
+    highlightChart,
+    deleteChart,
+    resizeChart,
+    changeChartRange,
+    changeChartCellData,
+    renderChart,
+    getChartJson,
+    insertToStore
+    // ChartSetting,
+    // ChartRender
 }

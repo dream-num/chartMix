@@ -1,5 +1,10 @@
 <template>
-  <el-collapse-item name="3" title="图例设置">
+  <el-collapse-item name="3">
+        <template slot="title">
+      {{setItem.modalName}}
+      <i class="iconfont icon-biaoti"></i>
+    </template>
+
     <!-- 图例显示 -->
     <chart-base-switch :switchValue.sync="legend.show">
       <div slot="title">显示图例</div>
@@ -19,10 +24,18 @@
       <!-- 自定义图例位置 -->
       <el-row v-if="legend.position.value === 'custom'">
         <!-- 水平偏移量 -->
-        <chart-base-slider :baseSliderOption.sync="legend.position.offsetX" :unit="'%'" :content="'滑动修改水平偏移量'"></chart-base-slider>
+        <chart-base-slider
+          :baseSliderOption.sync="legend.position.offsetX"
+          :unit="'%'"
+          :content="'滑动修改水平偏移量'"
+        ></chart-base-slider>
 
         <!-- 垂直偏移量 -->
-        <chart-base-slider :baseSliderOption.sync="legend.position.offsetY" :unit="'%'" :content="'滑动修改垂直偏移量'"></chart-base-slider>
+        <chart-base-slider
+          :baseSliderOption.sync="legend.position.offsetY"
+          :unit="'%'"
+          :content="'滑动修改垂直偏移量'"
+        ></chart-base-slider>
       </el-row>
 
       <chart-base-select :selectOption="dirOptions" :selectValue.sync="legend.position.direction">
@@ -38,8 +51,18 @@
       </chart-base-select>
 
       <!-- 自定义图例大小 -->
-      <chart-base-slider v-if="legend.width.value == 'custom'" :baseSliderOption.sync="legend.width.cusSize" :unit="'px'" :content="'滑动修改图例宽度'"></chart-base-slider>
-      <chart-base-slider v-if="legend.height.value == 'custom'" :baseSliderOption.sync="legend.height.cusSize" :unit="'px'" :content="'滑动修改图例高度'"></chart-base-slider>
+      <chart-base-slider
+        v-if="legend.width.value == 'custom'"
+        :baseSliderOption.sync="legend.width.cusSize"
+        :unit="'px'"
+        :content="'滑动修改图例宽度'"
+      ></chart-base-slider>
+      <chart-base-slider
+        v-if="legend.height.value == 'custom'"
+        :baseSliderOption.sync="legend.height.cusSize"
+        :unit="'px'"
+        :content="'滑动修改图例高度'"
+      ></chart-base-slider>
 
       <!-- 图例间距 -->
       <chart-base-select :selectOption="distanceOption" :selectValue.sync="legend.distance.value">
@@ -47,7 +70,12 @@
       </chart-base-select>
 
       <!-- 自定义图例间距 -->
-      <chart-base-slider v-if="legend.distance.value == 'custom'" :baseSliderOption.sync="legend.distance.cusGap" :unit="'px'" :content="'滑动修改图例间距'">
+      <chart-base-slider
+        v-if="legend.distance.value == 'custom'"
+        :baseSliderOption.sync="legend.distance.cusGap"
+        :unit="'px'"
+        :content="'滑动修改图例间距'"
+      >
         <div slot="title">图例样式</div>
       </chart-base-slider>
     </div>
@@ -57,12 +85,18 @@
 <script>
 import { positionOption, sizeOption, distanceOption } from "@/data/chartJson";
 import * as t from "@/utils/importUtil";
+import transCN from "@/data/cn";
+import transEN from "@/data/en";
 
 export default {
   props: {
     legendOption: Object,
     chartAllType: String,
-    router: String
+    router: String,
+    lang: {
+      type: String,
+      default: "cn",
+    },
   },
   data() {
     return {
@@ -72,12 +106,20 @@ export default {
       distanceOption: t.deepCopy(distanceOption),
       dirOptions: [
         { value: "horizontal", label: "水平" },
-        { value: "vertical", label: "垂直" }
-      ]
+        { value: "vertical", label: "垂直" },
+      ],
+      setItem:{}
     };
   },
   components: {
-    ...t.importComp(t)
+    ...t.importComp(t),
+  },
+  mounted() {
+    if (this.lang == "ch") {
+      this.setItem = transCN["chartLegend"];
+      return;
+    }
+    this.setItem = transEN["chartLegend"];
   },
   watch: {
     legendOption: {
@@ -88,29 +130,36 @@ export default {
         this.legend = t.deepCopy(newVal);
       },
       immediate: true,
-      deep: true
+      deep: true,
     },
     legend: {
-      handler: function(newVal, oldVal) {
+      handler: function (newVal, oldVal) {
         // 改变值就重新渲染
         if (oldVal) {
           this.changeLegend();
         }
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
+    lang(val) {
+      if (val == "ch") {
+        this.setItem = transCN["chartLegend"];
+        return;
+      }
+      this.setItem = transEN["chartLegend"];
+    },
   },
   methods: {
-    ...t.mapActions('chartSetting' , ['updateChartItem']),
-    changeLegend(){
+    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    changeLegend() {
       const updateObj = {
         updateObj: t.deepCopy(this.legend),
         router: this.router,
-      }
-      this.updateChartItem(updateObj)
-    }
-  }
+      };
+      this.updateChartItem(updateObj);
+    },
+  },
 };
 </script>
 

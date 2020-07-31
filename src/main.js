@@ -8,8 +8,10 @@ import './plugins/svgicon.js'
 import './plugins/spectrum.min.css'
 import './plugins/spectrum.min'
 
+window.store = store
 // registers your plugins, modules, store
 Vue.use(chartmix,{store})
+console.dir(chartmix)
 
 Vue.config.productionTip = false
 

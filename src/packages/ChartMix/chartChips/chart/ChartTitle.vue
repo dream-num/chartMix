@@ -2,7 +2,7 @@
   <!-- 主标题设置 -->
   <el-collapse-item name="1">
     <template slot="title">
-      标题设置
+      {{setItem.modalName}}
       <i class="iconfont icon-biaoti"></i>
     </template>
 
@@ -29,67 +29,104 @@
     <!-- 自定义位置 -->
     <el-row v-if="title.position.value === 'custom'">
       <!-- 左边距偏移量 -->
-      <chart-base-slider :baseSliderOption.sync="title.position.offsetX" :unit="'%'" :content="'滑动修改左边距偏移量'"></chart-base-slider>
+      <chart-base-slider
+        :baseSliderOption.sync="title.position.offsetX"
+        :unit="'%'"
+        :content="'滑动修改左边距偏移量'"
+      ></chart-base-slider>
 
       <!--  上边距偏移量 -->
-      <chart-base-slider :baseSliderOption.sync="title.position.offsetY" :unit="'%'" :content="'滑动修改上边距偏移量'"></chart-base-slider>
+      <chart-base-slider
+        :baseSliderOption.sync="title.position.offsetY"
+        :unit="'%'"
+        :content="'滑动修改上边距偏移量'"
+      ></chart-base-slider>
     </el-row>
   </el-collapse-item>
 </template>
 
 <script>
-import * as t from '@/utils/importUtil'
-import { positionOption } from '@/data/chartJson'
+import * as t from "@/utils/importUtil";
+import { positionOption } from "@/data/chartJson";
+import transCN from "@/data/cn";
+import transEN from "@/data/en";
 
 export default {
-  name: 'ChartTitle',
+  name: "ChartTitle",
   props: {
     router: String,
     chartAllType: String,
-    titleOption: Object
+    titleOption: Object,
+    lang: {
+      type: String,
+      default: "cn",
+    },
   },
   components: {
-    ...t.importComp(t)
+    ...t.importComp(t),
   },
-  data: function() {
-    return {
-      title: '', //整个title设置,
-      positionData: positionOption
+  mounted() {
+    if (this.lang == "ch") {
+      this.setItem = transCN["chartTitle"];
+      return;
     }
+    this.setItem = transEN["chartTitle"];
+  },
+  data: function () {
+    return {
+      title: "", //整个title设置,
+      positionData: positionOption,
+      isChange: false,
+      setItem:{}
+    };
   },
   watch: {
     titleOption: {
-      handler: function(newVal , oldVal){
-          if(t.isEqual(this.title,newVal)){
-                return;
-          }
-          this.title = t.deepCopy(newVal)
+      handler: function (newVal, oldVal) {
+        if (t.isEqual(this.title, newVal)) {
+          return;
+        }
+        if (oldVal) {
+          this.isChange = true;
+        }
+        this.title = t.deepCopy(newVal);
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
     title: {
-      handler: function(newVal , oldVal){
+      handler: function (newVal, oldVal) {
+        if (this.isChange) {
+          this.isChange = !this.isChange;
+          return;
+        }
         // 改变值就重新渲染
-        if(oldVal){
-          this.changeTitle()
+        if (oldVal) {
+          this.changeTitle();
         }
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
+    lang(val) {
+      if (val == "ch") {
+        this.setItem = transCN["chartTitle"];
+        return;
+      }
+      this.setItem = transEN["chartTitle"];
+    },
   },
   methods: {
-    ...t.mapActions('chartSetting' , ['updateChartItem']),
-    changeTitle(){
+    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    changeTitle() {
       const updateObj = {
         updateObj: t.deepCopy(this.title),
         router: this.router,
-      }
-      this.updateChartItem(updateObj)
-    }
-  }
-}
+      };
+      this.updateChartItem(updateObj);
+    },
+  },
+};
 </script>
 
 <style></style>

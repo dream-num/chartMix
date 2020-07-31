@@ -21,6 +21,17 @@ const baseComponent = {
         ratio: 1, //数值比例
         digit: 'auto', //小数位数
     },
+    item: {
+        color: null,
+        borderColor: '#000',
+        borderType: 'solid',
+        borderWidth: 1
+    },
+    lineStyle: {
+        color: null,
+        width: 1,
+        type: 'solid'
+    }
 };
 const chartComponent = {
     //标题设置
@@ -587,6 +598,7 @@ const chartOptions = {
 } //图表设置项
 
 export {
+    baseComponent,
     chartComponent,
     positionOption,
     distanceOption,

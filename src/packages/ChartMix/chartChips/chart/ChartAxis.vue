@@ -1,5 +1,9 @@
 <template>
-  <el-collapse-item name="6" title="XY轴设置">
+  <el-collapse-item name="6">
+    <template slot="title">
+      {{setItem.modalName}}
+      <i class="iconfont icon-biaoti"></i>
+    </template>
     <!-- 选择坐标轴 -->
     <chart-base-select :selectOption="axisGroup" :selectValue.sync="axis.axisType">
       <div slot="select">选择坐标轴</div>
@@ -32,17 +36,36 @@
       </chart-base-switch>
 
       <!-- 坐标轴间隔数 -->
-      <chart-base-slider :hideCol="true" :max="10" :baseSliderOption.sync="series.tickLabel.optimize" :unit="'个'" :content="'滑动修改坐标轴间隔个数'">
+      <chart-base-slider
+        :hideCol="true"
+        :max="10"
+        :baseSliderOption.sync="series.tickLabel.optimize"
+        :unit="'个'"
+        :content="'滑动修改坐标轴间隔个数'"
+      >
         <div slot="title">坐标轴间隔个数</div>
       </chart-base-slider>
 
       <div v-show="series.title.text">
         <!-- 标题与轴线距离 -->
-        <chart-base-slider :hideCol="true" :baseSliderOption.sync="series.title.nameGap" :unit="'px'" :content="'滑动修改标题与轴线距离'">
+        <chart-base-slider
+          :hideCol="true"
+          :baseSliderOption.sync="series.title.nameGap"
+          :unit="'px'"
+          :content="'滑动修改标题与轴线距离'"
+        >
           <div slot="title">标题与轴线距离</div>
         </chart-base-slider>
         <!-- 倾斜轴标题 -->
-        <chart-base-slider :hideCol="true" :format="formatRotation+''" :max="180" :min="-180" :baseSliderOption.sync="series.title.rotate" :unit="'°'" :content="'滑动修改标题与轴线距离'">
+        <chart-base-slider
+          :hideCol="true"
+          :format="formatRotation+''"
+          :max="180"
+          :min="-180"
+          :baseSliderOption.sync="series.title.rotate"
+          :unit="'°'"
+          :content="'滑动修改标题与轴线距离'"
+        >
           <div slot="title">倾斜轴标题</div>
         </chart-base-slider>
       </div>
@@ -53,7 +76,13 @@
       </chart-base-switch>
 
       <!-- 刻度线宽度 -->
-      <chart-base-slider :hideCol="true" :min="1" :baseSliderOption.sync="series.tickLine.width" :unit="'px'" :content="'滑动修改刻度线宽度'">
+      <chart-base-slider
+        :hideCol="true"
+        :min="1"
+        :baseSliderOption.sync="series.tickLine.width"
+        :unit="'px'"
+        :content="'滑动修改刻度线宽度'"
+      >
         <div slot="title">刻度线宽度</div>
       </chart-base-slider>
       <!-- 刻度线颜色 -->
@@ -77,12 +106,25 @@
       </chart-base-select>
 
       <!-- 刻度长度 -->
-      <chart-base-slider :hideCol="true" :min="1" :baseSliderOption.sync="series.tick.length" :unit="'px'" :content="'滑动修改刻度长度'">
+      <chart-base-slider
+        :hideCol="true"
+        :min="1"
+        :baseSliderOption.sync="series.tick.length"
+        :unit="'px'"
+        :content="'滑动修改刻度长度'"
+      >
         <div slot="title">刻度长度</div>
       </chart-base-slider>
 
       <!-- 刻度宽度 -->
-      <chart-base-slider :hideCol="true" :max="20" :min="1" :baseSliderOption.sync="series.tick.width" :unit="'px'" :content="'滑动修改刻度宽度'">
+      <chart-base-slider
+        :hideCol="true"
+        :max="20"
+        :min="1"
+        :baseSliderOption.sync="series.tick.width"
+        :unit="'px'"
+        :content="'滑动修改刻度宽度'"
+      >
         <div slot="title">刻度宽度</div>
       </chart-base-slider>
       <!-- 刻度颜色 -->
@@ -101,18 +143,34 @@
       </chart-base-switch>
 
       <!-- 倾斜标签 -->
-      <chart-base-slider :hideCol="true" :format="formatRotation" :max="180" :min="-180" :baseSliderOption.sync="series.tickLabel.rotate" :unit="'°'" :content="'滑动修改标签倾斜角度'">
+      <chart-base-slider
+        :hideCol="true"
+        :format="formatRotation"
+        :max="180"
+        :min="-180"
+        :baseSliderOption.sync="series.tickLabel.rotate"
+        :unit="'°'"
+        :content="'滑动修改标签倾斜角度'"
+      >
         <div slot="title">倾斜标签</div>
       </chart-base-slider>
 
       <!-- Y轴有数据编辑 -->
       <div v-show="showLabel">
         <!-- 刻度最小值 -->
-        <chart-base-input :type="'text'" :inputValue.sync="series.tickLabel.min" :placeholder="'请输入刻度最小值'">
+        <chart-base-input
+          :type="'text'"
+          :inputValue.sync="series.tickLabel.min"
+          :placeholder="'请输入刻度最小值'"
+        >
           <div slot="input">刻度最小值</div>
         </chart-base-input>
         <!-- 刻度最大值 -->
-        <chart-base-input :type="'text'" :inputValue.sync="series.tickLabel.max" :placeholder="'请输入刻度最大值且最大值不能小于最小值'">
+        <chart-base-input
+          :type="'text'"
+          :inputValue.sync="series.tickLabel.max"
+          :placeholder="'请输入刻度最大值且最大值不能小于最小值'"
+        >
           <div slot="input">刻度最大值</div>
         </chart-base-input>
         <!-- 数值缩放比例 -->
@@ -141,7 +199,14 @@
 
       <div v-show="series.netLine.show">
         <!-- 网格线宽度 -->
-        <chart-base-slider :hideCol="true" :max="20" :min="1" :baseSliderOption.sync="series.netLine.width" :unit="'px'" :content="'滑动修改网格线宽度'">
+        <chart-base-slider
+          :hideCol="true"
+          :max="20"
+          :min="1"
+          :baseSliderOption.sync="series.netLine.width"
+          :unit="'px'"
+          :content="'滑动修改网格线宽度'"
+        >
           <div slot="title">网格线宽度</div>
         </chart-base-slider>
         <!-- 网格线类型 -->
@@ -158,11 +223,19 @@
           </el-col>
         </el-row>
         <!-- 网格线分割间隔数 -->
-        <chart-base-select :selectOption="intervalOption" :selectValue.sync="series.netLine.interval.value">
+        <chart-base-select
+          :selectOption="intervalOption"
+          :selectValue.sync="series.netLine.interval.value"
+        >
           <div slot="select">网格线分割间隔数</div>
         </chart-base-select>
         <!-- 自定义间隔数 -->
-        <chart-base-slider v-if="series.netLine.interval.value == 'custom'" :baseSliderOption.sync="series.netLine.interval.cusNumber" :unit="'个'" :content="'滑动修改间隔数'"></chart-base-slider>
+        <chart-base-slider
+          v-if="series.netLine.interval.value == 'custom'"
+          :baseSliderOption.sync="series.netLine.interval.cusNumber"
+          :unit="'个'"
+          :content="'滑动修改间隔数'"
+        ></chart-base-slider>
       </div>
 
       <!-- 显示网格区域 -->
@@ -171,12 +244,20 @@
       </chart-base-switch>
       <div v-show="series.netArea.show">
         <!-- 网格区域分割间隔数 -->
-        <chart-base-select :selectOption="intervalOption" :selectValue.sync="series.netArea.interval.value">
+        <chart-base-select
+          :selectOption="intervalOption"
+          :selectValue.sync="series.netArea.interval.value"
+        >
           <div slot="select">网格区域分割间隔数</div>
         </chart-base-select>
         <!-- 自定义间隔数 -->
-        <chart-base-slider v-if="series.netArea.interval.value == 'custom'" :baseSliderOption.sync="series.netArea.interval.cusNumber" :unit="'个'" :content="'滑动修改间隔数'"></chart-base-slider>
-        
+        <chart-base-slider
+          v-if="series.netArea.interval.value == 'custom'"
+          :baseSliderOption.sync="series.netArea.interval.cusNumber"
+          :unit="'个'"
+          :content="'滑动修改间隔数'"
+        ></chart-base-slider>
+
         <el-row style="margin-top: 15px;">
           <el-col :span="6">网格区域第一颜色</el-col>
           <el-col :span="3">
@@ -193,116 +274,147 @@
 </template>
 
 <script>
-import * as t from '@/utils/importUtil'
-import { fontSizeOption, lineStyleOption, intervalOption, digitOption, ratioOption,} from '@/data/chartJson';
+import * as t from "@/utils/importUtil";
+import {
+  fontSizeOption,
+  lineStyleOption,
+  intervalOption,
+  digitOption,
+  ratioOption,
+} from "@/data/chartJson";
+import transCN from "@/data/cn";
+import transEN from "@/data/en";
+
 export default {
-    name: 'ChartXaxis',
-    props: {
-        chartAllType: String,
-        axisOption: Object,
-        router: String
+  name: "ChartXaxis",
+  props: {
+    chartAllType: String,
+    axisOption: Object,
+    router: String,
+    lang: {
+      type: String,
+      default: "cn",
     },
-    components: {
-       ...t.importComp(t)
-    },
-    data() {
-        return {
-            axis: {},
-            series: {}, //具体坐标轴配置
-            fontSizeOption: '',
-            lineStyleOption: '',
-            ratioOption: '',
-            digitOption: '',
-            fzPosOption: [
-                { value: 'middle', label: '居中' },
-                { value: 'start', label: '头部' },
-                { value: 'end', label: '尾部' },
-                { value: 'hidden', label: '隐藏' },
-            ],
-            orient: [
-                { label: '朝内', value: 'inside' },
-                { label: '朝外', value: 'outside' },
-            ],
-            formatRotation: function(val){
-              return val + ' °';
-            }
-        };
-    },
-    watch: {
-        axisOption: {
-            handler(newVal) {
-                if(t.isEqual(this.axis,this.axisOption)){
-                  return;
-                }
-                this.axis = t.deepCopy(this.axisOption)
-                this.series = this.axis[newVal.axisType]
-                this.fontSizeOption = t.deepCopy(fontSizeOption);
-                this.lineStyleOption = t.deepCopy(lineStyleOption);
-                this.intervalOption = t.deepCopy(intervalOption);
-                this.ratioOption = t.deepCopy(ratioOption);
-                this.digitOption = t.deepCopy(digitOption);
-            },
-            immediate: true,
-            deep: true,
-        },
-        series: {
-          handler: function(newVal , oldVal){
-            // 改变值就重新渲染
-            if(oldVal){
-              this.changeAxis()
-            }
-          },
-          deep: true,
-          immediate: true
+  },
+  components: {
+    ...t.importComp(t),
+  },
+  data() {
+    return {
+      axis: {},
+      series: {}, //具体坐标轴配置
+      fontSizeOption: "",
+      lineStyleOption: "",
+      ratioOption: "",
+      digitOption: "",
+      fzPosOption: [
+        { value: "middle", label: "居中" },
+        { value: "start", label: "头部" },
+        { value: "end", label: "尾部" },
+        { value: "hidden", label: "隐藏" },
+      ],
+      orient: [
+        { label: "朝内", value: "inside" },
+        { label: "朝外", value: "outside" },
+      ],
+      formatRotation: function (val) {
+        return val + " °";
+      },
+      setItem: {},
+    };
+  },
+  mounted() {
+    if (this.lang == "ch") {
+      this.setItem = transCN["chartAxis"];
+      return;
+    }
+    this.setItem = transEN["chartAxis"];
+  },
+  watch: {
+    axisOption: {
+      handler(newVal) {
+        if (t.isEqual(this.axis, this.axisOption)) {
+          return;
         }
+        this.axis = t.deepCopy(this.axisOption);
+        this.series = this.axis[newVal.axisType];
+        this.fontSizeOption = t.deepCopy(fontSizeOption);
+        this.lineStyleOption = t.deepCopy(lineStyleOption);
+        this.intervalOption = t.deepCopy(intervalOption);
+        this.ratioOption = t.deepCopy(ratioOption);
+        this.digitOption = t.deepCopy(digitOption);
+      },
+      immediate: true,
+      deep: true,
     },
-    computed: {
-        chartType(){
-          return this.chartAllType.split('|')[1]
-        },
-        chartStyle(){
-          return this.chartAllType.split('|')[2]
-        },
-        axisGroup() {
-            if (this.chartType == 'bar' && this.chartStyle != 'compare') {
-                return [
-                    { value: 'xAxisDown', label: 'Y轴(左侧垂直)' },
-                    { value: 'xAxisUp', label: 'Y轴(左侧垂直)' },
-                    { value: 'yAxisLeft', label: 'X轴(下方水平)' },
-                    { value: 'yAxisRight', label: 'X轴(上方水平)' },
-                ];
-            } else if (this.chartStyle == 'compare') {
-                return [
-                    { value: 'xAxisDown', label: 'Y轴(右侧坐标轴)' },
-                    { value: 'xAxisUp', label: 'Y轴(左侧坐标轴)' },
-                    { value: 'yAxisLeft', label: 'X轴(右侧坐标轴)' },
-                    { value: 'yAxisRight', label: 'X轴(左侧坐标轴)' },
-                ];
-            } else {
-                return [
-                    { value: 'xAxisDown', label: 'X轴(下方水平)' },
-                    { value: 'xAxisUp', label: 'X轴(上方水平)' },
-                    { value: 'yAxisLeft', label: 'Y轴(左侧垂直)' },
-                    { value: 'yAxisRight', label: 'Y轴(右侧垂直)' },
-                ];
-            }
-        },
-        showLabel(){
-          if((this.chartType == 'bar' && this.axis.axisType.slice(0,1) == 'x') || (this.chartType != 'bar' && this.axis.axisType.slice(0,1) == 'y')){
-            return true
-          }
+    series: {
+      handler: function (newVal, oldVal) {
+        // 改变值就重新渲染
+        if (oldVal) {
+          this.changeAxis();
         }
+      },
+      deep: true,
+      immediate: true,
     },
-    methods: {
-        ...t.mapActions('chartSetting' , ['updateChartItem']),
-        changeAxis(){
-          const updateObj = {
-            updateObj: t.deepCopy(this.series),
-            router: this.router + '/' + this.axis.axisType,
-          }
-          this.updateChartItem(updateObj)
-        }
+    lang(val) {
+      if (val == "ch") {
+        this.setItem = transCN["chartAxis"];
+        return;
+      }
+      this.setItem = transEN["chartAxis"];
     },
+  },
+  computed: {
+    chartType() {
+      return this.chartAllType.split("|")[1];
+    },
+    chartStyle() {
+      return this.chartAllType.split("|")[2];
+    },
+    axisGroup() {
+      if (this.chartType == "bar" && this.chartStyle != "compare") {
+        return [
+          { value: "xAxisDown", label: "Y轴(左侧垂直)" },
+          { value: "xAxisUp", label: "Y轴(左侧垂直)" },
+          { value: "yAxisLeft", label: "X轴(下方水平)" },
+          { value: "yAxisRight", label: "X轴(上方水平)" },
+        ];
+      } else if (this.chartStyle == "compare") {
+        return [
+          { value: "xAxisDown", label: "Y轴(右侧坐标轴)" },
+          { value: "xAxisUp", label: "Y轴(左侧坐标轴)" },
+          { value: "yAxisLeft", label: "X轴(右侧坐标轴)" },
+          { value: "yAxisRight", label: "X轴(左侧坐标轴)" },
+        ];
+      } else {
+        return [
+          { value: "xAxisDown", label: "X轴(下方水平)" },
+          { value: "xAxisUp", label: "X轴(上方水平)" },
+          { value: "yAxisLeft", label: "Y轴(左侧垂直)" },
+          { value: "yAxisRight", label: "Y轴(右侧垂直)" },
+        ];
+      }
+    },
+    showLabel() {
+      if (
+        (this.chartType == "bar" && this.axis.axisType.slice(0, 1) == "x") ||
+        (this.chartType != "bar" && this.axis.axisType.slice(0, 1) == "y")
+      ) {
+        return true;
+      }
+    },
+  },
+  methods: {
+    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    changeAxis() {
+      const updateObj = {
+        updateObj: t.deepCopy(this.series),
+        router: this.router + "/" + this.axis.axisType,
+      };
+      this.updateChartItem(updateObj);
+    },
+  },
 };
 </script>
 

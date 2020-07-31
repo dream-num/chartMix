@@ -16,7 +16,7 @@ export default {
             'zIndex': 1,
             'color': '#EF9A9A',
             'active': false,
-            'chart_id': 'chart_a_001',
+            'chart_id': 'chart_5erpeWc1eWal_1596092336315',
         },
         {
             'width': 200,
@@ -34,7 +34,7 @@ export default {
             'zIndex': 2,
             'color': '#AED581',
             'active': false,
-            'chart_id': 'chart_a_002',
+            'chart_id': 'chart_5erpeWc1eWal_15960973336319',
         },
         {
             'width': 200,
@@ -52,7 +52,7 @@ export default {
             'zIndex': 3,
             'color': '#81D4FA',
             'active': false,
-            'chart_id': 'chart_a_003',
+            'chart_id': 'chart_5erpeWc1eWal_1596093236310',
         }
     ]
 };

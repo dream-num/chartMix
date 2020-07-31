@@ -36,16 +36,16 @@
             <el-tab-pane label="ToolBar" name="ToolBar">
                 <ToolBar ></ToolBar>
             </el-tab-pane>
-            <el-tab-pane label="ChartSetting" name="ChartSetting">
+            <el-tab-pane label="ChartSetting" name="ChartSetting" style="height: 500px;">
                 <div class="chartsetting-container">
                     <ChartSetting :chartOptions="currentChartOptions" ></ChartSetting>
                 </div>
             </el-tab-pane>
-            <el-tab-pane label="ChartList" name="ChartList">
+            <!-- <el-tab-pane label="ChartList" name="ChartList">
                 <div class="chartsetting-container">
                     <ChartSetting :chartOptions="currentChartOptions" ></ChartSetting>
                 </div>
-            </el-tab-pane>
+            </el-tab-pane> -->
         </el-tabs>
         
     </div>
@@ -54,9 +54,9 @@
 <script>
     import { mapState , mapActions} from 'vuex'
     import VueDragResize from './VueDragResize';
-    import ChartRender from '../packages/ChartMix/ChartRender';
+    // import ChartRender from '../packages/ChartMix/ChartRender';
     import ToolBar from './ToolBar';
-    import ChartSetting from '../packages/ChartMix/ChartSetting'
+    // import ChartSetting from '../packages/ChartMix/ChartSetting'
     import ChartList from '../packages/ChartMix/ChartList'
     import '../assets/icons';
     import {deepCopy} from '@/utils/util'
@@ -66,9 +66,9 @@
 
         components: {
             VueDragResize,
-            ChartRender,
+            // ChartRender,
             ToolBar,
-            ChartSetting,
+            // ChartSetting,
             ChartList
         },
 

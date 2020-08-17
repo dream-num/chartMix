@@ -1,4 +1,6 @@
-import { merge, cloneDeep } from 'lodash';
+// import { merge, cloneDeep } from 'lodash';
+import merge from 'lodash/merge';
+import cloneDeep from 'lodash/cloneDeep';
 import { chartOptions } from '@/data/chartJson';
 
 const option = {

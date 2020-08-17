@@ -209,7 +209,8 @@ import ChartList from "./ChartList";
 
 import { deepCopy } from "@/utils/util";
 import { checkCurrentBoxChange, changeSeriesOrder } from "@/utils/chartUtil";
-import { isEqual } from "lodash";
+// import { isEqual } from "lodash";
+import isEqual from 'lodash/isEqual';
 import { chartComponent, chartOptions } from "@/data/chartJson";
 import { mapState, mapActions } from "vuex";
 import transCN from "@/data/cn";

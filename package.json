@@ -20,7 +20,6 @@
     "jquery": "^3.5.1",
     "lodash": "^4.17.15",
     "neo-async": "^2.6.1",
-    "spectrum": "^1.0.1",
     "terser-webpack-plugin": "^4.1.0",
     "vue": "^2.6.11",
     "vue-drag-resize": "^1.3.2",

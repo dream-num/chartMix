@@ -1842,7 +1842,7 @@ export default {
           //   } else {
           //     return (
           //       series.series.prefixVal.trim() +
-          //       jfgrid.floatTool.multiply(data, series.series.valueRatio) +
+          //       luckysheet.floatTool.multiply(data, series.series.valueRatio) +
           //       "%" +
           //       series.series.suffixVal.trim()
           //     );
@@ -1853,7 +1853,7 @@ export default {
           //   } else {
           //     return (
           //       series.series.prefixVal.trim() +
-          //       jfgrid.floatTool
+          //       luckysheet.floatTool
           //         .multiply(data, series.series.valueRatio)
           //         .toFixed(series.series.valueDigit) +
           //       "%" +
@@ -1878,7 +1878,7 @@ export default {
             } else {
               return (
                 option.prefixVal.trim() +
-                jfgrid.floatTool.multiply(data, option.valueRatio) +
+                luckysheet.floatTool.multiply(data, option.valueRatio) +
                 '%' +
                 option.suffixVal.trim()
               )
@@ -1889,7 +1889,7 @@ export default {
             } else {
               return (
                 option.prefixVal.trim() +
-                jfgrid.floatTool
+                luckysheet.floatTool
                   .multiply(data, option.valueRatio)
                   .toFixed(option.valueDigit) +
                 '%' +
@@ -1916,7 +1916,7 @@ export default {
           //     return (
           //       series.series.prefixVal.trim() +
           //       (flag ? "" : "-") +
-          //       jfgrid.floatTool.multiply(
+          //       luckysheet.floatTool.multiply(
           //         params.value,
           //         series.series.valueRatio
           //       ) +
@@ -1931,7 +1931,7 @@ export default {
           //     return (
           //       series.series.prefixVal.trim() +
           //       (flag ? "" : "-") +
-          //       jfgrid.floatTool
+          //       luckysheet.floatTool
           //         .multiply(params.value, series.series.valueRatio)
           //         .toFixed(series.series.valueDigit) +
           //       (series.showPercent ? "%" : "") +
@@ -1957,7 +1957,7 @@ export default {
               return (
                 option.prefixVal.trim() +
                 (flag ? '' : '-') +
-                jfgrid.floatTool.multiply(params.value, option.valueRatio) +
+                luckysheet.floatTool.multiply(params.value, option.valueRatio) +
                 (series.showPercent ? '%' : '') +
                 option.suffixVal.trim()
               )
@@ -1969,7 +1969,7 @@ export default {
               return (
                 option.prefixVal.trim() +
                 (flag ? '' : '-') +
-                jfgrid.floatTool
+                luckysheet.floatTool
                   .multiply(params.value, option.valueRatio)
                   .toFixed(option.valueDigit) +
                 (series.showPercent ? '%' : '') +
@@ -1989,7 +1989,7 @@ export default {
           //   return (
           //     params.seriesName +
           //     series.series.prefixVal.trim() +
-          //     jfgrid.floatTool.multiply(
+          //     luckysheet.floatTool.multiply(
           //       params.value,
           //       series.series.valueRatio
           //     ) +
@@ -2000,7 +2000,7 @@ export default {
           //   return (
           //     params.seriesName +
           //     series.series.prefixVal.trim() +
-          //     jfgrid.floatTool
+          //     luckysheet.floatTool
           //       .multiply(params.value, series.series.valueRatio)
           //       .toFixed(series.series.valueDigit) +
           //     (series.showPercent ? "%" : "") +
@@ -2016,7 +2016,7 @@ export default {
             return (
               params.seriesName +
               option.prefixVal.trim() +
-              jfgrid.floatTool.multiply(params.value, option.valueRatio) +
+              luckysheet.floatTool.multiply(params.value, option.valueRatio) +
               (series.showPercent ? '%' : '') +
               option.suffixVal.trim()
             )
@@ -2024,7 +2024,7 @@ export default {
             return (
               params.seriesName +
               option.prefixVal.trim() +
-              jfgrid.floatTool
+              luckysheet.floatTool
                 .multiply(params.value, option.valueRatio)
                 .toFixed(option.valueDigit) +
               (series.showPercent ? '%' : '') +
@@ -2044,7 +2044,7 @@ export default {
           //     ? true
           //     : false;
           // if (series.series.valueDigit == "default") {
-          //   var data = jfgrid.floatTool.multiply(
+          //   var data = luckysheet.floatTool.multiply(
           //     series.data[params.seriesIndex][params.dataIndex],
           //     series.series.valueRatio
           //   );
@@ -2067,7 +2067,7 @@ export default {
           //     "%"
           //   );
           // } else {
-          //   var data = jfgrid.floatTool
+          //   var data = luckysheet.floatTool
           //     .multiply(
           //       series.data[params.seriesIndex][params.dataIndex],
           //       series.series.valueRatio
@@ -2102,7 +2102,7 @@ export default {
               ? true
               : false
           if (option.valueDigit == 'default') {
-            var data = jfgrid.floatTool.multiply(
+            var data = luckysheet.floatTool.multiply(
               series.data[params.seriesIndex][params.dataIndex],
               option.valueRatio
             )
@@ -2125,7 +2125,7 @@ export default {
               '%'
             )
           } else {
-            var data = jfgrid.floatTool
+            var data = luckysheet.floatTool
               .multiply(
                 series.data[params.seriesIndex][params.dataIndex],
                 option.valueRatio
@@ -2159,7 +2159,7 @@ export default {
           // var series = args[0];
           // var params = args[1];
           // if (series.series.valueDigit == "default") {
-          //   var data = jfgrid.floatTool.multiply(
+          //   var data = luckysheet.floatTool.multiply(
           //     series.data[params.seriesIndex][params.dataIndex],
           //     series.series.valueRatio
           //   );
@@ -2175,7 +2175,7 @@ export default {
           //     series.series.suffixVal.trim()
           //   );
           // } else {
-          //   var data = jfgrid.floatTool
+          //   var data = luckysheet.floatTool
           //     .multiply(
           //       series.data[params.seriesIndex][params.dataIndex],
           //       series.series.valueRatio
@@ -2200,7 +2200,7 @@ export default {
             var params = args[2]
             var option = series.totalArr[index + 1]
             if (option.valueDigit == 'default') {
-              var data = jfgrid.floatTool.multiply(
+              var data = luckysheet.floatTool.multiply(
                 series.data[params.seriesIndex][params.dataIndex],
                 option.valueRatio
               )
@@ -2212,7 +2212,7 @@ export default {
               // }
               return option.prefixVal.trim() + data + option.suffixVal.trim()
             } else {
-              var data = jfgrid.floatTool
+              var data = luckysheet.floatTool
                 .multiply(
                   series.data[params.seriesIndex][params.dataIndex],
                   option.valueRatio
@@ -2236,7 +2236,7 @@ export default {
           // var series = args[0];
           // var params = args[1];
           // if (series.series.valueDigit == "default") {
-          //   var data = jfgrid.floatTool.multiply(
+          //   var data = luckysheet.floatTool.multiply(
           //     series.data[params.seriesIndex][params.dataIndex],
           //     series.series.valueRatio
           //   );
@@ -2255,7 +2255,7 @@ export default {
           //     series.series.suffixVal.trim()
           //   );
           // } else {
-          //   var data = jfgrid.floatTool
+          //   var data = luckysheet.floatTool
           //     .multiply(
           //       series.data[params.seriesIndex][params.dataIndex],
           //       series.series.valueRatio
@@ -2282,7 +2282,7 @@ export default {
             var params = args[2]
             var option = series.totalArr[index + 1]
             if (option.valueDigit == 'default') {
-              var data = jfgrid.floatTool.multiply(
+              var data = luckysheet.floatTool.multiply(
                 series.data[params.seriesIndex][params.dataIndex],
                 option.valueRatio
               )
@@ -2301,7 +2301,7 @@ export default {
                 option.suffixVal.trim()
               )
             } else {
-              var data = jfgrid.floatTool
+              var data = luckysheet.floatTool
                 .multiply(
                   series.data[params.seriesIndex][params.dataIndex],
                   option.valueRatio
@@ -2330,7 +2330,7 @@ export default {
           // var series = args[0];
           // var params = args[1];
           // if (series.series.valueDigit == "default") {
-          //   var data = jfgrid.floatTool.multiply(
+          //   var data = luckysheet.floatTool.multiply(
           //     series.data[params.seriesIndex][params.dataIndex],
           //     series.series.valueRatio
           //   );
@@ -2349,7 +2349,7 @@ export default {
           //     series.series.suffixVal.trim()
           //   );
           // } else {
-          //   var data = jfgrid.floatTool
+          //   var data = luckysheet.floatTool
           //     .multiply(
           //       series.data[params.seriesIndex][params.dataIndex],
           //       series.series.valueRatio
@@ -2376,7 +2376,7 @@ export default {
             var params = args[2]
             var option = series.totalArr[index + 1]
             if (option.valueDigit == 'default') {
-              var data = jfgrid.floatTool.multiply(
+              var data = luckysheet.floatTool.multiply(
                 series.data[params.seriesIndex][params.dataIndex],
                 option.valueRatio
               )
@@ -2395,7 +2395,7 @@ export default {
                 option.suffixVal.trim()
               )
             } else {
-              var data = jfgrid.floatTool
+              var data = luckysheet.floatTool
                 .multiply(
                   series.data[params.seriesIndex][params.dataIndex],
                   option.valueRatio
@@ -2434,7 +2434,7 @@ export default {
           // }
 
           // if (series.series.valueDigit == "default") {
-          //   var data = jfgrid.floatTool.multiply(
+          //   var data = luckysheet.floatTool.multiply(
           //     series.data[params.seriesIndex][params.dataIndex],
           //     series.series.valueRatio
           //   );
@@ -2446,7 +2446,7 @@ export default {
           //     series.series.suffixVal.trim()
           //   );
           // } else {
-          //   var data = jfgrid.floatTool.multiply(
+          //   var data = luckysheet.floatTool.multiply(
           //     series.data[params.seriesIndex][params.dataIndex],
           //     series.series.valueRatio
           //   );
@@ -2476,7 +2476,7 @@ export default {
           }
 
           if (option.valueDigit == "default") {
-            var data = jfgrid.floatTool.multiply(
+            var data = luckysheet.floatTool.multiply(
               series.data[params.seriesIndex][params.dataIndex],
               option.valueRatio
             );
@@ -2488,7 +2488,7 @@ export default {
               option.suffixVal.trim()
             );
           } else {
-            var data = jfgrid.floatTool.multiply(
+            var data = luckysheet.floatTool.multiply(
               series.data[params.seriesIndex][params.dataIndex],
               option.valueRatio
             );

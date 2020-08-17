@@ -1,4 +1,4 @@
-import { getChartDataCache, getRangeSplitArray, getChartDataSeriesOrder, addDataToOption, deepCopy } from '../utils/util'
+import { getChartDataCache,getRowColCheck, getRangeSplitArray, getChartDataSeriesOrder, addDataToOption, deepCopy } from '../utils/util'
 import echartsEngine from '@/utils/echartsEngine/index'
 import store from '../store'
 // import highchartsEngine from './highchartsEngine'
@@ -30,6 +30,7 @@ const setChartOptionsByRouter = function (chartOptions, router, updateObj) {
 
     }
     deepFind(defaultOption);
+    renderChart({chartOptions: chartOptions})
     return chartOptions;
 }
 
@@ -38,7 +39,9 @@ const setChartOptionsByRouter = function (chartOptions, router, updateObj) {
  * 
  */
 const renderChart = function (renderChartObj, ele) {
-    const { chart_id, chartOptions } = renderChartObj;
+    let chartOptions = renderChartObj.chartOptions
+    let chart_id = chartOptions.chart_id
+    // const { chart_id, chartOptions } = renderChartObj;
     const chartAllTypeArray = chartOptions.chartAllType.split('|');
     const chartPro = chartAllTypeArray[0];
     // const container = ele || document.getElementById(chart_id);
@@ -278,7 +281,7 @@ const changeChangeAllType = function (chart_json, chartAllType) {
 
     store.dispatch('chartSetting/updateChartItemChartlist', updateJson)
 
-    renderChart({ chartOptions: updateJson, chart_id: 'chart_a_001' })
+    renderChart({ chartOptions: updateJson, chart_id: chart_id })
 }
 
 // 行/列标题操作以及转置操作
@@ -328,7 +331,7 @@ const checkCurrentBoxChange = function (chart_id, rangeRowCheck, rangeColCheck, 
 
     store.dispatch('chartSetting/updateChartItemChartlist', updateJson)
 
-    renderChart({ chartOptions: updateJson, chart_id: 'chart_a_001' })
+    renderChart({ chartOptions: updateJson, chart_id: chart_id })
 }
 
 //系列数据顺序变化
@@ -337,7 +340,7 @@ const changeSeriesOrder = function (chart_json, chartDataSeriesOrder) {
         return;
     }
 
-    var chartID = chart_json.chart_id;
+    var chart_id = chart_json.chart_id;
 
     var chartAllTypeArray = chart_json.chartAllType.split("|");
     var chartPro = chartAllTypeArray[0],
@@ -354,7 +357,156 @@ const changeSeriesOrder = function (chart_json, chartDataSeriesOrder) {
     );
 
     store.dispatch('chartSetting/updateChartItemChartlist', chart_json)
-    renderChart({ chartOptions: updateJson, chart_id: 'chart_a_001' })
+    renderChart({ chartOptions: chart_json, chart_id: chart_id })
+}
+
+function changeChartRange(
+    chart_id,
+    chartData,
+    rangeArray,
+    rangeTxt
+) {
+    let index = store.state.chartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
+    store.state.chartSetting.currentChartIndex = index
+
+    var chart_json = store.state.chartSetting.chartLists[index].chartOptions
+
+    var chartAllType = chart_json.chartAllType;
+
+    var chartAllTypeArray = chartAllType.split("|");
+
+    var chartPro = chartAllTypeArray[0],
+        chartType = chartAllTypeArray[1],
+        chartStyle = chartAllTypeArray[2];
+
+    //数据的sheet索引
+    chart_json.rangeArray = rangeArray;
+    chart_json.chartData = chartData;
+    chart_json.rangeTxt = rangeTxt;
+
+    //根据数据集得到按钮状态，rangeColCheck表示首列是否标题，rangeRowCheck表示首行是否标题，rangeConfigCheck表示是否转置。
+    var rowColCheck = getRowColCheck(chartData);
+    var rangeRowCheck = rowColCheck[0],
+        rangeColCheck = rowColCheck[1],
+        rangeConfigCheck = false;
+
+    // 如果列转置标识,再转为列转置
+    // rangeColCheck.exits = colExits
+
+    chart_json.rangeColCheck = rangeColCheck;
+    chart_json.rangeRowCheck = rangeRowCheck;
+    chart_json.rangeConfigCheck = rangeConfigCheck;
+
+    //按照数据范围文字得到具体数据范围
+    var rangeSplitArray = getRangeSplitArray(
+        chartData,
+        rangeArray,
+        rangeColCheck,
+        rangeRowCheck
+    );
+    chart_json.rangeSplitArray = rangeSplitArray;
+
+    //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
+    var chartDataCache = getChartDataCache(
+        chartData,
+        rangeSplitArray,
+        chartPro,
+        chartType,
+        chartStyle
+    );
+    chart_json.chartDataCache = chartDataCache;
+
+    //生成默认的系列顺序，默认根据series数组的位置，用户可以在界面上操作更改这个位置。
+    var chartDataSeriesOrder = getChartDataSeriesOrder(
+        chartDataCache.series[0].length
+    );
+    chart_json.chartDataSeriesOrder = chartDataSeriesOrder;
+
+    var defaultOptionIni = chart_json.defaultOption;
+    //根据图表的默认设置、图表数据、图表系列顺序，等到一个完整的图表配置串。
+
+    var defaultOption = addDataToOption(
+        defaultOptionIni,
+        chartDataCache,
+        chartDataSeriesOrder,
+        chartPro,
+        chartType,
+        chartStyle,
+        true,
+        chartData
+    )
+
+    chart_json.defaultOption = defaultOption;
+
+    store.dispatch('chartSetting/updateChartItemChartlist', chart_json)
+    renderChart({ chartOptions: chart_json, chart_id: chart_id })
+}
+
+function changeChartCellData(chart_id, chartData) {
+
+    let index = store.state.chartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
+    store.state.chartSetting.currentChartIndex = index
+
+    var chart_json = store.state.chartSetting.chartLists[index].chartOptions
+
+    var chartAllType = chart_json.chartAllType;
+
+    var chartAllTypeArray = chartAllType.split("|");
+
+    var chartPro = chartAllTypeArray[0],
+        chartType = chartAllTypeArray[1],
+        chartStyle = chartAllTypeArray[2];
+
+    //数据的sheet索引
+    chart_json.chartData = chartData;
+
+    var rangeRowCheck = chart_json.rangeRowCheck;
+    var rangeColCheck = chart_json.rangeColCheck;
+
+    //按照数据范围文字得到具体数据范围
+    var rangeSplitArray = getRangeSplitArray(
+        chartData,
+        chart_json.rangeArray,
+        rangeColCheck,
+        rangeRowCheck
+    );
+    chart_json.rangeSplitArray = rangeSplitArray;
+
+    //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
+    var chartDataCache = getChartDataCache(
+        chartData,
+        rangeSplitArray,
+        chartPro,
+        chartType,
+        chartStyle
+    );
+    chart_json.chartDataCache = chartDataCache;
+
+    //��成默认的系列顺序，默认根据series数组的位置，用户可以在界面上操作更改这个位置。
+    var chartDataSeriesOrder = getChartDataSeriesOrder(
+        chartDataCache.series[0].length
+    );
+    chart_json.chartDataSeriesOrder = chartDataSeriesOrder;
+
+    var defaultOptionIni = chart_json.defaultOption;
+
+    //根据图表的默认设置、图表数据、图表系列顺序，等到一个完整的图表配置串。
+
+    var defaultOption = addDataToOption(
+        defaultOptionIni,
+        chartDataCache,
+        chartDataSeriesOrder,
+        chartPro,
+        chartType,
+        chartStyle,
+        true,
+        chartData
+    )
+
+    chart_json.defaultOption = defaultOption;
+
+    store.dispatch('chartSetting/updateChartItemChartlist', chart_json)
+    renderChart({ chartOptions: chart_json, chart_id: chart_id })
 }
 
 export {
@@ -366,5 +518,7 @@ export {
     transCustom,
     changeChangeAllType,
     checkCurrentBoxChange,
-    changeSeriesOrder
+    changeSeriesOrder,
+    changeChartRange,
+    changeChartCellData
 }

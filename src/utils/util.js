@@ -498,8 +498,8 @@ function getRangeSplitArray(
 //处理qk格式的数据返回原始值，###########需要完善日期获取############。
 function getChartCellData(r, c, d) {
     var value = null
-    // if (jfgrid != null && jfgrid.getcellvalue != null) {
-    //   value = jfgrid.getcellvalue(r, c, d)
+    // if (luckysheet != null && luckysheet.getcellvalue != null) {
+    //   value = luckysheet.getcellvalue(r, c, d)
     // } else {
     var cell = d[r][c]
     if (cell != null) {
@@ -1259,7 +1259,7 @@ function transformPie(defaultOptionIni, chartDataCache, seriesData, legendData, 
     }
 
     for (var i = 0; i < seriesData.length; i++) {
-        if (i > 1) {
+        if (i > 0) {
             return
         }
         if (defaultOptionIni.series[i] == null) {
@@ -1335,26 +1335,7 @@ function initPie(series, chartDataCache, seriesData, legendData, product, type, 
 
 // 编辑饼图
 function editPie(series, chartDataCache, seriesData, legendData, chartPro, chartType, chartStyle) {
-    seires.name = legendData
-
-    // 如果原来的数据长度小于所选的数据长度
-    if (series.data.length < seriesData.length) {
-        for (let k = series.data.length; k < seriesData.length; k++) {
-            series.data.push({
-                value,
-                name,
-                y: value
-            })
-        }
-    }
-    // 如果原来的数据长度大于所选的数据长度,多余的部分数据为0,name为空
-    if (series.data.length > seriesData.length) {
-        for (let i = seriesData.length; i < series.data.length; i++) {
-            series.data[i].value = ''
-            series.data[i].y = ''
-            series.data[i].name = ''
-        }
-    }
+    series.name = legendData
 
     for (let j = 0; j < seriesData.length; j++) {
         let value
@@ -1370,6 +1351,25 @@ function editPie(series, chartDataCache, seriesData, legendData, chartPro, chart
         series.data[j].name = name
         series.data[j].value = value
         series.data[j].y = value
+
+        // 如果原来的数据长度小于所选的数据长度
+        if (series.data.length < seriesData.length) {
+            for (let k = series.data.length; k < seriesData.length; k++) {
+                series.data.push({
+                    value,
+                    name,
+                    y: value
+                })
+            }
+        }
+        // 如果原来的数据长度大于所选的数据长度,多余的部分数据为0,name为空
+        if (series.data.length > seriesData.length) {
+            for (let i = seriesData.length; i < series.data.length; i++) {
+                series.data[i].value = ''
+                series.data[i].y = ''
+                series.data[i].name = ''
+            }
+        }
     }
     return series
 }

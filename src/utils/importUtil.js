@@ -5,9 +5,19 @@ const ChartBaseInput = () => import('@/packages/ChartMix/chartChips/base/ChartBa
 const ChartBaseSelect = () => import('@/packages/ChartMix/chartChips/base/ChartBaseSelect')
 const ChartBaseSlider = () => import('@/packages/ChartMix/chartChips/base/ChartBaseSlider')
 const ChartBaseBox = () => import('@/packages/ChartMix/chartChips/base/ChartBaseBox')
+
 import { mapActions } from 'vuex'
 import { deepCopy } from '@/utils/util'
 import { isEqual } from 'lodash'
+
+// import ChartBaseLabel from '@/packages/ChartMix/chartChips/base/ChartBaseLabel'
+// import ChartBaseSwitch from '@/packages/ChartMix/chartChips/base/ChartBaseSwitch'
+// import ChartBaseInput from '@/packages/ChartMix/chartChips/base/ChartBaseInput'
+// import ChartBaseSelect from '@/packages/ChartMix/chartChips/base/ChartBaseSelect'
+// import ChartBaseSlider from '@/packages/ChartMix/chartChips/base/ChartBaseSlider'
+// import ChartBaseBox from '@/packages/ChartMix/chartChips/base/ChartBaseBox'
+
+
 // 重复引入的组件
 const importComp = function(t){
     return {

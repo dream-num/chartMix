@@ -1,12 +1,15 @@
 import store from '../store'
 import Vue from 'vue'
-import { generateRandomKey, deepCopy, getRowColCheck, getRangeSplitArray, getChartDataCache , getChartDataSeriesOrder , addDataToOption } from '../utils/util'
+import { generateRandomKey, deepCopy, getRowColCheck, getRangeSplitArray, getChartDataCache, getChartDataSeriesOrder, addDataToOption } from '../utils/util'
+import { changeChartRange , changeChartCellData , renderChart } from '../utils/chartUtil'
 import { chartOptions } from '../data/chartJson'
+import echarts from 'echarts'
+import $ from 'jquery'
 
 const ChartSetting = store.state.chartSetting
 
 // init chart
-function initChart(outDom , lang) {
+function initChart(outDom, lang) {
     let dom = document.createElement('div')
     dom.id = 'chartmix'
     outDom.appendChild(dom);
@@ -14,8 +17,8 @@ function initChart(outDom , lang) {
     new Vue({
         el: '#chartmix',
         store,
-        data(){
-            return{
+        data() {
+            return {
                 lang
             }
         },
@@ -47,36 +50,30 @@ function createChart(render, chartData, chart_id, rangeArray, rangeTxt) {
     chartOptions.defaultOption.series = []
 
     // 随机生成图表
-    let ratio = Math.random()*10
-    if(ratio > 5){
+    let ratio = Math.random() * 10
+    if (ratio > 5) {
         chartOptions.chartAllType = 'echarts|pie|default'
-    }else{
+    } else {
         chartOptions.chartAllType = 'echarts|line|default'
     }
 
     // 生成图表数据结构
-    let chartOption = insertNewChart(chartOptions , chart_Id , chartOptions.chartAllType , chartData , rangeArray, rangeTxt)
+    let chartOption = insertNewChart(chartOptions, chart_Id, chartOptions.chartAllType, chartData, rangeArray, rangeTxt)
 
     let renderDom = document.createElement('div')
     renderDom.id = 'render' + chart_Id
     render.appendChild(renderDom)
 
-    // 插入store和export出去的配置
     let chart_json = {
         'chart_id': chart_Id,
         'active': true,
         'chartOptions': deepCopy(chartOption)
     }
 
-    store.commit('UPDATE_CHART_ITEM_ONE' , {
-        key: 'currentChartIndex',
-        value: ChartSetting.chartLists.length
-    })
-
-    // ChartSetting.currentChartIndex = ChartSetting.chartLists.length
+    ChartSetting.currentChartIndex = ChartSetting.chartLists.length
     ChartSetting.chartLists.push(chart_json)
 
-    console.dir(chartOption)
+    console.dir(chart_json)
 
     new Vue({
         el: '#render' + chart_Id,
@@ -89,17 +86,17 @@ function createChart(render, chartData, chart_id, rangeArray, rangeTxt) {
         computed: {
             options() {
                 let chartJson = ChartSetting.chartLists.find(item => item.chart_id == this.chart_Id)
-                if(chartJson){
+                if (chartJson) {
                     return chartJson.chartOptions
-                }else{
+                } else {
                     return null
                 }
             },
             active() {
                 let chartJson = ChartSetting.chartLists.find(item => item.chart_id == this.chart_Id)
-                if(chartJson){
+                if (chartJson) {
                     return chartJson.active
-                }else{
+                } else {
                     return null
                 }
             }
@@ -115,7 +112,7 @@ function createChart(render, chartData, chart_id, rangeArray, rangeTxt) {
 }
 
 // insert chart
-function insertNewChart (
+function insertNewChart(
     chartOptions,
     chart_id,
     chartAllType,
@@ -133,8 +130,8 @@ function insertNewChart (
     var chartAllTypeArray = chartAllType.split('|')
 
     var chartPro = chartAllTypeArray[0],
-      chartType = chartAllTypeArray[1],
-      chartStyle = chartAllTypeArray[2]
+        chartType = chartAllTypeArray[1],
+        chartStyle = chartAllTypeArray[2]
 
     chart_json.chart_id = chart_id
     chart_json.chartAllType = chartAllType
@@ -157,8 +154,8 @@ function insertNewChart (
     //根据数据集得到按钮状态，rangeColCheck表示首列是否标题，rangeRowCheck表示首行是否标题，rangeConfigCheck表示是否转置。
     var rowColCheck = getRowColCheck(chartData)
     var rangeRowCheck = rowColCheck[0],
-      rangeColCheck = rowColCheck[1],
-      rangeConfigCheck = false
+        rangeColCheck = rowColCheck[1],
+        rangeConfigCheck = false
 
     chart_json.rangeColCheck = rangeColCheck
     chart_json.rangeRowCheck = rangeRowCheck
@@ -166,27 +163,27 @@ function insertNewChart (
 
     //按照数据范围文字得到具体数据范围
     var rangeSplitArray = getRangeSplitArray(
-      chartData,
-      rangeArray,
-      rangeColCheck,
-      rangeRowCheck
+        chartData,
+        rangeArray,
+        rangeColCheck,
+        rangeRowCheck
     )
     chart_json.rangeSplitArray = rangeSplitArray
 
     //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
     //数据为一行且为汉字的时候，chartDataCache的series为空数组
     var chartDataCache = getChartDataCache(
-      chartData,
-      rangeSplitArray,
-      chartPro,
-      chartType,
-      chartStyle
+        chartData,
+        rangeSplitArray,
+        chartPro,
+        chartType,
+        chartStyle
     )
     chart_json.chartDataCache = chartDataCache
 
     //生成默认的系列顺序，默认根据series数组的位置，用户可以在界面上操作更改这个位置。
     var chartDataSeriesOrder = getChartDataSeriesOrder(
-      chartDataCache.series[0].length
+        chartDataCache.series[0].length
     )
 
     chart_json.chartDataSeriesOrder = chartDataSeriesOrder
@@ -210,23 +207,42 @@ function insertNewChart (
 }
 
 // highlight current chart
-function highlightChart(chart_id){
+function highlightChart(chart_id) {
     let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
     ChartSetting.currentChartIndex = index
+    return ChartSetting.chartLists[ChartSetting.currentChartIndex].chartOptions
 }
 
 // resize chart
-function resizeChart(chart_id){
+function resizeChart(chart_id) {
+    let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
+    var chartAllType = ChartSetting.chartLists[index].chartOptions.chartAllType;
+    var chartAllTypeArray = chartAllType.split("|");
+    var chartPro = chartAllTypeArray[0],
+        chartType = chartAllTypeArray[1],
+        chartStyle = chartAllTypeArray[2];
 
+    if (chartPro == "echarts") {
+        echarts.getInstanceById($("#" + chart_id).attr("_echarts_instance_")).resize();
+    } 
+}
+
+function resizeChartAll(){
+    for(let i = 0; i < ChartSetting.chartLists.length; i++){
+        let chartJson = ChartSetting.chartLists[i].chartOptions
+        if(chartJson.chartAllType.split('|')[0] == 'echarts'){
+            echarts.getInstanceById($('#' + chartJson.chart_id).attr('_echarts_instance_')).resize()
+        }
+    }
 }
 
 // delete chart
-function deleteChart(chart_id){
+function deleteChart(chart_id) {
     let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
-    ChartSetting.chartLists.splice(index , 1)
+    ChartSetting.chartLists.splice(index, 1)
     ChartSetting.currentChartIndex--
-    if(ChartSetting.currentChartIndex < 0){
-        if(ChartSetting.chartLists[0]){
+    if (ChartSetting.currentChartIndex < 0) {
+        if (ChartSetting.chartLists[0]) {
             ChartSetting.currentChartIndex = 0
             return
         }
@@ -234,9 +250,25 @@ function deleteChart(chart_id){
     }
 }
 
+function getChartJson(chart_id){
+    let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
+    return  ChartSetting.chartLists[index].chartOptions;
+}
+
+function insertToStore(chart_json){
+    ChartSetting.chartLists.push(chart_json)
+}
+
 export {
     initChart,
     createChart,
     highlightChart,
-    deleteChart
+    deleteChart,
+    resizeChart,
+    resizeChartAll,
+    changeChartRange,
+    changeChartCellData,
+    getChartJson,
+    renderChart,
+    insertToStore
 }

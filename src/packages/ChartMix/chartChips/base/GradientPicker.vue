@@ -973,7 +973,7 @@ export default {
       this.isShowPanel = true
       // 当前的取色器显示,其他的隐藏
       var el = $(e.target)
-      var els = $('#jfgrid-data-visualization .main')
+      var els = $('#luckysheet-data-visualization .main')
       els.css('display', 'none')
       el.css('display', 'block')
 

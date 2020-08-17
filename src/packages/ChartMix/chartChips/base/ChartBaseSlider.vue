@@ -79,7 +79,8 @@ export default {
       this.$emit("update:baseSliderOption", value);
     },
     formatter(val){
-      eval(this.format)
+      // eval(this.format)
+      return null
     }
   }
 };

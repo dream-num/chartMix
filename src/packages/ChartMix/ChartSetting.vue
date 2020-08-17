@@ -6,15 +6,17 @@
         :chartAllType="currentChartType"
         @closeChartShowList="showList=false"
         :showList="showList"
+        :lang="lang"
       ></chart-list>
       <!-- 数据选择框 -->
       <div>
         <!-- tab切换 -->
-        <el-tabs @tab-click="handleClick" type="card">
+        <el-tabs @tab-click="handleClick" v-model="activeName" type="card">
           <!-- 数据tab -->
           <el-tab-pane name="data">
             <span slot="label">
-              <i class="el-icon-date"></i> 数据
+              <i class="el-icon-date"></i>
+              {{setItem.data}}
             </span>
 
             <el-row>
@@ -23,7 +25,7 @@
               </el-col>
               <el-col :span="22">
                 <!-- 图表类型 -->
-                <div style="margin-top: 1px;">图表类型</div>
+                <div style="margin-top: 1px;">{{setItem.chartType}}</div>
                 <div style="margin-top: 10px;">
                   <el-button @click="showList = !showList" size="small" style="width:100%;">
                     <i :class="chartTypeTxt[0]" class="iconfont" style="float:left;"></i>
@@ -37,81 +39,96 @@
 
                 <div style="margin-top:25px;"></div>
                 <!-- X轴 -->
-                <div
-                  :key="item.title"
-                  style="margin-top: 10px;"
-                  v-for="item in chartXYSeriesList.fix"
-                >
-                  <el-row :gutter="10">
-                    <el-col :span="4" style="line-height: 28px;text-align:right;">{{ item.title }}:</el-col>
-                    <el-col :span="20">
-                      <el-tag size="medium" style="width:100%;text-align:center;">
-                        <i :class="item.type" class="iconfont" style="float:left;"></i>
-                        {{ item.field }}
-                      </el-tag>
-                    </el-col>
-                  </el-row>
+                <div v-if="chartXYSeriesList">
+                  <div
+                    :key="item.title"
+                    style="margin-top: 10px;"
+                    v-for="item in chartXYSeriesList.fix"
+                  >
+                    <el-row :gutter="10">
+                      <el-col
+                        :span="4"
+                        style="line-height: 28px;text-align:right;"
+                      >{{ item.title }}:</el-col>
+                      <el-col :span="20">
+                        <el-tag size="medium" style="width:100%;text-align:center;">
+                          <i :class="item.type" class="iconfont" style="float:left;"></i>
+                          {{ item.field }}
+                        </el-tag>
+                      </el-col>
+                    </el-row>
+                  </div>
                 </div>
 
                 <div style="margin-top:25px;"></div>
                 <!-- 系列 -->
-                <div
-                  :key="index"
-                  style="margin-top: 10px;"
-                  v-for="(item,index) in chartXYSeriesList.change"
-                >
-                  <el-row :gutter="10">
-                    <el-col :span="4" style="line-height: 28px;text-align:right;">{{item.title}}:</el-col>
-                    <el-col :span="20">
-                      <el-dropdown
-                        @command="handleSeriseCommand"
-                        size="medium"
-                        style="width:100%;"
-                        trigger="click"
-                      >
-                        <el-button size="mini" style="width:100%;">
-                          <i :class="item.type" class="iconfont" style="float:left;font-size:16px;"></i>
-                          {{item.field}}
-                          <i
-                            class="iconfont icon-jiantou"
-                            style="float:right;"
-                          ></i>
-                        </el-button>
-                        <el-dropdown-menu slot="dropdown" style="min-width:306px;">
-                          <el-dropdown-item
-                            :command="{series:item, option:ditem}"
-                            :key="`A-${index}`"
-                            v-for="(ditem,index) in chartXYSeriesList.option"
-                          >
-                            {{ditem.field}}
+                <div v-if="chartXYSeriesList">
+                  <div
+                    :key="index"
+                    style="margin-top: 10px;"
+                    v-for="(item,index) in chartXYSeriesList.change"
+                  >
+                    <el-row :gutter="10">
+                      <el-col :span="4" style="line-height: 28px;text-align:right;">{{item.title}}:</el-col>
+                      <el-col :span="20">
+                        <el-dropdown
+                          @command="handleSeriseCommand"
+                          size="medium"
+                          style="width:100%;"
+                          trigger="click"
+                        >
+                          <el-button size="mini" style="width:100%;">
                             <i
-                              class="iconfont icon-dagou"
-                              style="float:right;"
-                              v-if="item.id==ditem.id"
+                              :class="item.type"
+                              class="iconfont"
+                              style="float:left;font-size:16px;"
                             ></i>
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </el-dropdown>
-                    </el-col>
-                  </el-row>
+                            {{item.field}}
+                            <i
+                              class="iconfont icon-jiantou"
+                              style="float:right;"
+                            ></i>
+                          </el-button>
+                          <el-dropdown-menu slot="dropdown" style="min-width:306px;">
+                            <el-dropdown-item
+                              :command="{series:item, option:ditem}"
+                              :key="`A-${index}`"
+                              v-for="(ditem,index) in chartXYSeriesList.option"
+                            >
+                              {{ditem.field}}
+                              <i
+                                class="iconfont icon-dagou"
+                                style="float:right;"
+                                v-if="item.id==ditem.id"
+                              ></i>
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
+                      </el-col>
+                    </el-row>
+                  </div>
                 </div>
+
                 <div style="margin-top:25px;"></div>
                 <!-- 转置 -->
                 <el-row>
                   <div style="margin: 25px 0;"></div>
-                  <el-checkbox @change="checkBoxChange" v-model="currentRangeConfigCheck">转置(切换行/列)</el-checkbox>
+                  <el-checkbox
+                    @change="checkBoxChange"
+                    v-model="currentRangeConfigCheck"
+                  >{{setItem.transpose}}</el-checkbox>
                   <div style="margin: 15px 0;"></div>
                   <el-checkbox
                     :disabled="checkRowDisabled"
                     @change="checkBoxChange"
                     v-model="currentRangeRowCheck.exits"
-                  >设选中项第{{getColRowCheckTxt(true)}}行为标题</el-checkbox>
+                  >{{setItem.row1}} {{getColRowCheckTxt(true)}} {{setItem.row2}}</el-checkbox>
                   <div style="margin: 15px 0;"></div>
                   <el-checkbox
                     :disabled="checkColDisabled"
                     @change="checkBoxChange"
                     v-model="currentRangeColCheck.exits"
-                  >设选中项第{{getColRowCheckTxt()}}列为标签</el-checkbox>
+                  >{{setItem.column1}} {{getColRowCheckTxt()}} {{setItem.column2}}</el-checkbox>
                 </el-row>
               </el-col>
             </el-row>
@@ -120,7 +137,8 @@
           <!-- 样式tab -->
           <el-tab-pane>
             <span slot="label">
-              <i class="el-icon-s-data"></i> 样式
+              <i class="el-icon-s-data"></i>
+              {{setItem.style}}
             </span>
 
             <el-row>
@@ -134,12 +152,14 @@
                     :router="'title'"
                     :chartAllType="currentChartType"
                     :titleOption="titleOption"
+                    :lang="lang"
                   ></chart-title>
 
                   <chart-sub-title
                     :router="'subtitle'"
                     :chartAllType="currentChartType"
                     :subTitleOption="subTitleOption"
+                    :lang="lang"
                   ></chart-sub-title>
 
                   <!-- 鼠标提示组件 -->
@@ -147,6 +167,7 @@
                     :router="'tooltip'"
                     :chartAllType="currentChartType"
                     :cursorOption="cursorOption"
+                    :lang="lang"
                   ></chart-cursor>
 
                   <!-- 图例组件 -->
@@ -154,6 +175,7 @@
                     :router="'legend'"
                     :chartAllType="currentChartType"
                     :legendOption="legendOption"
+                    :lang="lang"
                   ></chart-legend>
 
                   <!-- 坐标轴组件 -->
@@ -162,6 +184,7 @@
                     :router="'axis'"
                     :axisOption="axisOption"
                     :chartAllType="currentChartType"
+                    :lang="lang"
                   ></chart-axis>
                 </el-collapse>
               </el-col>
@@ -178,17 +201,25 @@
 
 <script>
 import ChartList from "./ChartList";
-const ChartTitle = () => import("./chartChips/chart/ChartTitle");
-const ChartSubTitle = () => import("./chartChips/chart/ChartSubTitle");
-const ChartCursor = () => import("./chartChips/chart/ChartCursor");
-const ChartLegend = () => import("./chartChips/chart/ChartLegend");
-const ChartAxis = () => import("./chartChips/chart/ChartAxis");
+// const ChartTitle = () => import("./chartChips/chart/ChartTitle");
+// const ChartSubTitle = () => import("./chartChips/chart/ChartSubTitle");
+// const ChartCursor = () => import("./chartChips/chart/ChartCursor");
+// const ChartLegend = () => import("./chartChips/chart/ChartLegend");
+// const ChartAxis = () => import("./chartChips/chart/ChartAxis");
 
 import { deepCopy } from "@/utils/util";
-import { checkCurrentBoxChange , changeSeriesOrder } from "@/utils/chartUtil";
+import { checkCurrentBoxChange, changeSeriesOrder } from "@/utils/chartUtil";
 import { isEqual } from "lodash";
 import { chartComponent, chartOptions } from "@/data/chartJson";
 import { mapState, mapActions } from "vuex";
+import transCN from "@/data/cn";
+import transEN from "@/data/en";
+
+import ChartTitle from './chartChips/chart/ChartTitle'
+import ChartSubTitle from './chartChips/chart/ChartSubTitle'
+import ChartCursor from './chartChips/chart/ChartCursor'
+import ChartLegend from './chartChips/chart/ChartLegend'
+import ChartAxis from './chartChips/chart/ChartAxis'
 
 export default {
   name: "ChartSetting",
@@ -205,17 +236,38 @@ export default {
       type: Object,
       default: null,
     },
+    lang: {
+      type: String,
+      default: "cn",
+    },
   },
   data() {
     return {
       currentChartType: "echarts|line|default", //图表类型
+      chart_id: '',
       titleOption: deepCopy(chartComponent.title), //标题设置
       subTitleOption: deepCopy(chartComponent.subtitle), //标题设置
       cursorOption: deepCopy(chartComponent.tooltip), //鼠标提示设置
       legendOption: deepCopy(chartComponent.legend), //图例设置
       axisOption: deepCopy(chartComponent.axis), //坐标轴设置
       showList: false,
+      setItem: {
+        echarts: {
+          line: {
+            default: '默认折线图'
+          }
+        }
+      },
+      activeName: 'data'
     };
+  },
+  mounted() {
+    if (this.lang == "ch") {
+      this.setItem = transCN["chartSetting"];
+      return;
+    }
+    this.setItem = transEN["chartSetting"];
+    console.dir(this.setItem);
   },
   watch: {
     chartOptions: {
@@ -228,12 +280,20 @@ export default {
           return;
         }
         this.currentChartType = chartOption.chartAllType;
+        this.chart_id = chartOption.chart_id
         this.titleOption = chartOption.defaultOption.title;
         this.subTitleOption = chartOption.defaultOption.subtitle;
         this.cursorOption = chartOption.defaultOption.tooltip;
         this.legendOption = chartOption.defaultOption.legend;
         this.axisOption = chartOption.defaultOption.axis;
       },
+    },
+    lang(val) {
+      if (val == "ch") {
+        this.setItem = transCN["chartSetting"];
+        return;
+      }
+      this.setItem = transEN["chartSetting"];
     },
   },
   computed: {
@@ -247,7 +307,7 @@ export default {
           .rangeColCheck;
       },
       set(val) {
-        this.updateChartItemChartlistOne({ key: "rangeColCheck", value: val });
+        this.updateChartItemChartlistOne({ key: "rangeColCheck", value: val, chart_id: this.chart_id });
       },
     },
     currentRangeRowCheck: {
@@ -259,7 +319,7 @@ export default {
           .rangeRowCheck;
       },
       set(val) {
-        this.updateChartItemChartlistOne({ key: "rangeRowCheck", value:val });
+        this.updateChartItemChartlistOne({ key: "rangeRowCheck", value: val, chart_id: this.chart_id });
       },
     },
     checkRowDisabled() {
@@ -296,6 +356,7 @@ export default {
         this.updateChartItemChartlistOne({
           key: "rangeConfigCheck",
           value: val,
+          chart_id: this.chart_id
         });
       },
     },
@@ -310,21 +371,23 @@ export default {
     },
     //图表选项的文本
     chartTypeTxt: function () {
+
       var head, main, icon;
       if (this.chart_pro == "echarts") {
         head = "echarts";
       } else if (this.chart_pro == "highcharts") {
         head = "highcharts";
       }
+
       if (this.chart_type == "line") {
         if (this.chart_style == "default") {
-          main = "默认折线图";
+          main = this.setItem.echarts.line.default;
         }
         if (this.chart_style == "smooth") {
-          main = "平滑折线图";
+          main = this.setItem.echarts.line.smooth;
         }
         if (this.chart_style == "label") {
-          main = "带标签的折线图";
+          main = this.setItem.echarts.line.label;
         }
         if (this.chart_style == "doublex") {
           main = "双Y轴折线图";
@@ -336,10 +399,10 @@ export default {
         return [icon, head + " - " + main];
       } else if (this.chart_type == "area") {
         if (this.chart_style == "default") {
-          main = "默认面积图";
+          main = this.setItem.echarts.area.default;
         }
         if (this.chart_style == "stack") {
-          main = "堆叠面积图";
+          main = this.setItem.echarts.area.stack;
         }
         if (this.chart_style == "stackRatio") {
           main = "带标签的堆叠面积图";
@@ -348,10 +411,10 @@ export default {
         return [icon, head + " - " + main];
       } else if (this.chart_type == "column") {
         if (this.chart_style == "default") {
-          main = "默认柱状图";
+          main = this.setItem.echarts.column.default;
         }
         if (this.chart_style == "stack") {
-          main = "堆叠柱状图";
+          main = this.setItem.echarts.column.stack;
         }
         if (this.chart_style == "stackRatio") {
           main = "百分比堆叠柱状图";
@@ -378,10 +441,10 @@ export default {
         return [icon, head + " - " + main];
       } else if (this.chart_type == "bar") {
         if (this.chart_style == "default") {
-          main = "默认条形图";
+          main = this.setItem.echarts.bar.default;
         }
         if (this.chart_style == "stack") {
-          main = "堆叠条形图";
+          main = this.setItem.echarts.bar.stack;
         }
         if (this.chart_style == "stackRatio") {
           main = "百分比堆叠条形图";
@@ -396,13 +459,13 @@ export default {
         return [icon, head + " - " + main];
       } else if (this.chart_type == "pie") {
         if (this.chart_style == "default") {
-          main = "默认饼图";
+          main = this.setItem.echarts.pie.default;
         }
         if (this.chart_style == "split") {
-          main = "分离型饼图";
+          main = this.setItem.echarts.pie.split;
         }
         if (this.chart_style == "ring") {
-          main = "环形饼图";
+          main = this.setItem.echarts.pie.ring;
         }
         if (this.chart_style == "ringnest") {
           main = "环形嵌套图";
@@ -548,7 +611,7 @@ export default {
 
       return ret;
     },
-    currentChartDataSeriesOrder:{
+    currentChartDataSeriesOrder: {
       get() {
         if (this.currentChartIndex == null) {
           return {};
@@ -557,9 +620,13 @@ export default {
           .chartDataSeriesOrder;
       },
       set(val) {
-        this.updateChartItemChartlistOne({ key: "chartDataSeriesOrder", value: val });
-      }
-    }
+        this.updateChartItemChartlistOne({
+          key: "chartDataSeriesOrder",
+          value: val,
+          chart_id: this.chart_id
+        });
+      },
+    },
   },
   methods: {
     ...mapActions("chartSetting", ["updateChartItemChartlistOne"]),
@@ -636,7 +703,10 @@ export default {
 
       this.currentChartDataSeriesOrder = newOrder;
 
-      changeSeriesOrder(this.chartLists[this.currentChartIndex].chartOptions , this.currentChartDataSeriesOrder);
+      changeSeriesOrder(
+        this.chartLists[this.currentChartIndex].chartOptions,
+        this.currentChartDataSeriesOrder
+      );
     },
   },
 };

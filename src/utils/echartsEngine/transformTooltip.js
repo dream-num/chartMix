@@ -56,21 +56,21 @@ const transformTooltip = function (chartAllTypeArray, tooltip) {
         return str
     }
 
-    let formatter2 = function (params) {
-        if(format[params.seriesIndex].digit == 'auto'){
-            params.value = floatTool.multiply(+params.value, format[params.seriesIndex].ratio) + format[params.seriesIndex].suffix
-        }else{
-            params.value = floatTool.multiply(+params.value, format[params.seriesIndex].ratio).toFixed(format[params.seriesIndex].digit) + format[params.seriesIndex].suffix
-        }
-        let str = params.seriesName + "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + params.name + ":&nbsp;&nbsp;" + params.value;
-        return str
-    }
+    // let formatter2 = function (params) {
+    //     if(format[params.seriesIndex].digit == 'auto'){
+    //         params.value = floatTool.multiply(+params.value, format[params.seriesIndex].ratio) + format[params.seriesIndex].suffix
+    //     }else{
+    //         params.value = floatTool.multiply(+params.value, format[params.seriesIndex].ratio).toFixed(format[params.seriesIndex].digit) + format[params.seriesIndex].suffix
+    //     }
+    //     let str = params.seriesName + "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + params.name + ":&nbsp;&nbsp;" + params.value;
+    //     return str
+    // }
 
-    let actions = new Map([
-        ['item' , formatter2],
-        ['axis' , formatter1]
-    ]) 
-    resTooltip.formatter = actions.get(resTooltip.trigger)
+    // let actions = new Map([
+    //     ['item' , formatter2],
+    //     ['axis' , formatter1]
+    // ]) 
+    // resTooltip.formatter = actions.get(resTooltip.trigger)
 
     return resTooltip
 }

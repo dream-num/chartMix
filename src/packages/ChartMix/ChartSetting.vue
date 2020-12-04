@@ -149,43 +149,49 @@
                 <el-collapse>
                   <!-- 标题组件 -->
                   <chart-title
-                    :router="'title'"
+                    :router="'titlePlace'"
                     :chartAllType="currentChartType"
                     :titleOption="titleOption"
                     :lang="lang"
                   ></chart-title>
 
                   <chart-sub-title
-                    :router="'subtitle'"
+                    :router="'subtitlePlace'"
                     :chartAllType="currentChartType"
                     :subTitleOption="subTitleOption"
                     :lang="lang"
                   ></chart-sub-title>
 
                   <!-- 鼠标提示组件 -->
-                  <chart-cursor
+                  <!-- <chart-cursor
                     :router="'tooltip'"
                     :chartAllType="currentChartType"
                     :cursorOption="cursorOption"
                     :lang="lang"
-                  ></chart-cursor>
+                  ></chart-cursor> -->
 
                   <!-- 图例组件 -->
-                  <chart-legend
+                  <!-- <chart-legend
                     :router="'legend'"
                     :chartAllType="currentChartType"
                     :legendOption="legendOption"
                     :lang="lang"
-                  ></chart-legend>
+                  ></chart-legend> -->
 
                   <!-- 坐标轴组件 -->
-                  <chart-axis
-                    v-if="currentChartType.split('|')[1]!='pie'"
+                  <!-- <chart-axis
+                    v-if="chart_type !='pie'"
                     :router="'axis'"
                     :axisOption="axisOption"
                     :chartAllType="currentChartType"
                     :lang="lang"
-                  ></chart-axis>
+                  ></chart-axis> -->
+
+                  <!-- 系列组件 -->
+                  <chart-echarts-series :router="'commonSeries'" :lang="lang" v-if="echartsCommon" :seriesOptionData="seriesOptionData" :chartAllType="currentChartType"></chart-echarts-series>
+                  <!-- 饼图系列 -->
+                  <!-- <chart-pie-series :router="'pieSeries'" :lang="lang" v-if="chart_type == 'pie'" :pieOptionData="pieOptionData" :chartAllType="currentChartType"></chart-pie-series> -->
+
                 </el-collapse>
               </el-col>
               <el-col :span="1">
@@ -221,6 +227,8 @@ import ChartSubTitle from './chartChips/chart/ChartSubTitle'
 import ChartCursor from './chartChips/chart/ChartCursor'
 import ChartLegend from './chartChips/chart/ChartLegend'
 import ChartAxis from './chartChips/chart/ChartAxis'
+import ChartEchartsSeries from './chartChips/chart/ChartEchartsSeries'
+import PieSeries from './chartChips/chart/PieSeries'
 
 export default {
   name: "ChartSetting",
@@ -231,6 +239,8 @@ export default {
     "chart-cursor": ChartCursor,
     "chart-legend": ChartLegend,
     "chart-axis": ChartAxis,
+    'chart-echarts-series': ChartEchartsSeries,
+    'chart-pie-series': PieSeries
   },
   props: {
     chartOptions: {
@@ -239,7 +249,7 @@ export default {
     },
     lang: {
       type: String,
-      default: "cn",
+      default: "zh",
     },
   },
   data() {
@@ -251,6 +261,8 @@ export default {
       cursorOption: deepCopy(chartComponent.tooltip), //鼠标提示设置
       legendOption: deepCopy(chartComponent.legend), //图例设置
       axisOption: deepCopy(chartComponent.axis), //坐标轴设置
+      seriesOptionData: {},     //普通系列设置
+      pieOptionData: {},     //饼图系列设置
       showList: false,
       setItem: {
         echarts: {
@@ -263,7 +275,7 @@ export default {
     };
   },
   mounted() {
-    if (this.lang == "ch") {
+    if (this.lang == "zh") {
       this.setItem = transCN["chartSetting"];
       return;
     }
@@ -282,15 +294,17 @@ export default {
         }
         this.currentChartType = chartOption.chartAllType;
         this.chart_id = chartOption.chart_id
-        this.titleOption = chartOption.defaultOption.title;
-        this.subTitleOption = chartOption.defaultOption.subtitle;
-        this.cursorOption = chartOption.defaultOption.tooltip;
-        this.legendOption = chartOption.defaultOption.legend;
+        this.titleOption = chartOption.defaultOption.titlePlace;
+        this.subTitleOption = chartOption.defaultOption.subtitlePlace;
+        this.cursorOption = chartOption.defaultOption.tooltipPlace;
+        this.legendOption = chartOption.defaultOption.legendPlace;
         this.axisOption = chartOption.defaultOption.axis;
+        this.seriesOptionData = chartOption.defaultOption.commonSeries
+        this.pieOptionData = chartOption.defaultOption.pieSeries
       },
     },
     lang(val) {
-      if (val == "ch") {
+      if (val == "zh") {
         this.setItem = transCN["chartSetting"];
         return;
       }
@@ -299,6 +313,16 @@ export default {
   },
   computed: {
     ...mapState("chartSetting", ["chartLists", "currentChartIndex"]),
+    echartsCommon(){
+      if(this.chart_pro == 'echarts'){
+        if(this.chart_type == 'line' || this.chart_type == 'area' || this.chart_type == 'bar' || this.chart_type == 'column'){
+          if(this.seriesOptionData.option){
+            return true
+          }
+        }
+      }
+      return false
+    },
     currentRangeColCheck: {
       get() {
         if (this.currentChartIndex == null) {

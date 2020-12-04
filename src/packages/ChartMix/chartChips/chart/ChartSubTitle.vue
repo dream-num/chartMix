@@ -2,23 +2,38 @@
   <!-- 副标题设置 -->
   <el-collapse-item name="2">
     <template slot="title">
-      {{setItem.modalName}}&nbsp;&nbsp;&nbsp;&nbsp;
+      {{ setItem.modalName }}&nbsp;&nbsp;&nbsp;&nbsp;
       <i class="iconfont icon-biaoti"></i>
     </template>
 
     <!-- 副标题内容 -->
-    <chart-base-input :inputValue.sync="subTitle.text" :placeholder="setItem.placeholder">
-      <div slot="input">{{setItem.text}}</div>
+    <chart-base-input
+      :inputValue.sync="subTitle.text"
+      :placeholder="setItem.placeholder"
+      :prop="'text'"
+      @summit="summit(arguments)"
+    >
+      <div slot="input">{{ setItem.text }}</div>
     </chart-base-input>
 
     <!-- 副标题样式 -->
-    <chart-base-label :router="router + '/label'" :baseLabelOption="subTitle.label">
-      <div slot="title">{{setItem.label}}</div>
+    <chart-base-label
+      :router="router + '/label'"
+      :baseLabelOption="subTitle.label"
+      :prop="'subtitlePlace:label'"
+      @summit="summit(arguments)"
+    >
+      <div slot="title">{{ setItem.label }}</div>
     </chart-base-label>
 
     <!-- 主副标题间距 -->
-    <chart-base-select :selectOption="distanceOption" :selectValue.sync="subTitle.distance.value">
-      <div slot="select">{{setItem.gap}}</div>
+    <chart-base-select
+      :selectOption="distanceOption"
+      :selectValue.sync="subTitle.distance.value"
+      :prop="'distance.value'"
+      @summit="summit(arguments)"
+    >
+      <div slot="select">{{ setItem.gap }}</div>
     </chart-base-select>
 
     <!-- 自定义间距 -->
@@ -26,6 +41,8 @@
       v-if="subTitle.distance.value === 'custom'"
       :baseSliderOption.sync="subTitle.distance.cusGap"
       :unit="'px'"
+      :prop="'distance.cusGap'"
+      @summit="summit(arguments)"
       :content="setItem.content"
     ></chart-base-slider>
   </el-collapse-item>
@@ -45,7 +62,7 @@ export default {
     subTitleOption: Object,
     lang: {
       type: String,
-      default: "cn",
+      default: "zh",
     },
   },
   components: {
@@ -56,10 +73,12 @@ export default {
       subTitle: {}, //整个title设置
       distanceOption: t.deepCopy(distanceOption), //位置选择数组
       setItem: {},
+      prop: null,
+      oldVal: ''
     };
   },
   mounted() {
-    if (this.lang == "ch") {
+    if (this.lang == "zh") {
       this.setItem = transCN["chartSubTitle"];
       return;
     }
@@ -87,7 +106,7 @@ export default {
       immediate: true,
     },
     lang(val) {
-      if (val == "ch") {
+      if (val == "zh") {
         this.setItem = transCN["chartSubTitle"];
         return;
       }
@@ -95,13 +114,24 @@ export default {
     },
   },
   methods: {
-    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    ...t.mapActions("chartSetting", ["updateChartItem",'updateCurrentProp']),
     changeTitle() {
+      let prop = {
+        prop: "subtitlePlace:" + this.prop,
+        oldValue: this.oldVal,
+        value: this.curVal
+      };
       const updateObj = {
         updateObj: t.deepCopy(this.subTitle),
         router: this.router,
       };
+      this.updateCurrentProp(prop)
       this.updateChartItem(updateObj);
+    },
+    summit(val) {
+      this.prop = val[0];
+      this.curVal = val[1]
+      this.oldVal = val[2];
     },
   },
 };

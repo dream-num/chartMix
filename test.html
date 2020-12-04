@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        span{
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <span>1123</span>
+</body>
+<script>
+    // let obj = {
+    //     'series.label.color': 'red',
+    //     series: {
+    //         data: [
+    //             {
+    //                 label: {
+    //                     color: 'blue'
+    //                 }
+    //             }
+    //         ]
+    //     }
+    // }
+    // let final = {}
+    // let attr = 'series.label.color'
+    // let index = 0
+    // let value = null
+    // final.data = obj.series.data
+
+    // function getFullSeriesAttr(obj, attr, final, value, index) {
+    //     let arr = attr.split('.')
+    //     arr.shift()
+    //     function repeat(obj, final, value) {
+    //         for (let i = 0; i < arr.length; i++) {
+    //             if (i != arr.length - 1) {
+    //                 let field = arr[0]
+    //                 final[field] = {}
+    //                 arr.shift()
+    //                 repeat(obj, final[field], value)
+    //             } else {
+    //                 if (value) {
+    //                     final[arr[0]] = value
+    //                 } else {
+    //                     final[arr[0]] = obj[attr]
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     repeat(obj, final, value)
+    // }
+
+    // getFullSeriesAttr(obj, attr, final.data[index], value, index)
+    // console.dir(final)
+
+    // let attr = 'label.color'
+    // let pieSeries = {
+    //     label: {
+    //         color: 'red'
+    //     }
+    // }
+    // let value
+    // let arr = attr.split('.')
+    // function repeat(pieSeries) {
+    //     for (let i = 0; i < arr.length; i++) {
+    //         if (i != arr.length - 1) {
+    //             let field = arr[0]
+    //             arr.shift()
+    //             repeat(pieSeries[field])
+    //         } else {
+    //             value = pieSeries[arr[0]]
+    //         }
+    //     }
+    // }
+    // repeat(pieSeries)
+    // console.dir(value)
+
+    // let span = document.getElementsByTagName('span')[0]
+
+    let a 
+    let b = {
+        ...a
+    }
+</script>
+
+</html>

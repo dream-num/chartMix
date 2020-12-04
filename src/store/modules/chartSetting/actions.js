@@ -25,5 +25,17 @@ export default {
     },
     updateChartItemChartlistOne({commit} , params){
         commit(types.UPDATE_CHART_ITEM_CHARTLIST_ONE , params)
+    },
+    updateProp({commit}, params){
+        commit(types.UPDATE_PROP, params)
+    },
+    updateRenderView({commit}, params){
+        commit(types.UPDATE_RENDER_VIEW, params)
+    },
+    updateCurrentProp({commit}, params){
+        commit(types.UPDATE_CURRENT_PROP, params)
+    },
+    addProp({commit}, params){
+        commit(types.ADD_PROP, params)
     }
 };

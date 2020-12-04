@@ -35,7 +35,7 @@ const baseComponent = {
 };
 const chartComponent = {
     //标题设置
-    title: {
+    titlePlace: {
         show: false, //是否显示
         text: '默认标题', //标题内容
         label: deepCopy(baseComponent.label),
@@ -46,7 +46,7 @@ const chartComponent = {
         },
     },
     //副标题
-    subtitle: {
+    subtitlePlace: {
         show: false, //是否显示
         text: '', //标题内容
         label: deepCopy(baseComponent.label),
@@ -56,7 +56,7 @@ const chartComponent = {
         },
     },
     // 图表设置
-    config: {
+    configPlace: {
         color: 'transparent', //默认颜色//'#333'
         fontFamily: 'Sans-serif',
         grid: {
@@ -68,7 +68,7 @@ const chartComponent = {
         },
     },
     //图例设置
-    legend: {
+    legendPlace: {
         show: true,
         selectMode: 'multiple', //'single':单选 //'多选':multiple //'禁用':'disable'
         selected: [
@@ -110,7 +110,7 @@ const chartComponent = {
         itemGap: 10,
     },
     //提示设置
-    tooltip: {
+    tooltipPlace: {
         show: true, //鼠标提示显示
         label: deepCopy(baseComponent.label), //文字样式
         backgroundColor: 'rgba(50,50,50,0.7)', // 鼠标提示框背景色
@@ -418,7 +418,315 @@ const chartComponent = {
             },
         },
     },
+    // series
+    commonSeries: {
+        currentIndex: 0,  //当前系列index
+        option: [{       //通用series
+            lineWidth: 2,
+            cuslineWidth: 2,
+            lineType: "solid",
+            lineStyle: [],
+            lineColor: null,
+            itemColor: null,
+            barColor: null,
+            symbolSize: 3,
+            cusSymbolSize: 3,
+            showSymbol: true,
+            symbol: "emptyCircle",
+            symbol1: "circle",
+            barWidth: null,
+            cusbarWidth: 0,
+            barMinHeight: 0,
+            cusbarMinHeight: 0,
+            barGap: "30%",
+            cusbarGap: 0,
+            barCategoryGap: "20%",
+            cusbarCategoryGap: 0,
+            showLabel: false,
+            'format-ratio': "1",
+            'format-digit': "auto",
+            'format-prefix': "",
+            'format-suffix': "",
+            textPos: "inside",
+            offsetX: 0,
+            offsetY: 0,
+            fontPlace: [],
+            fzColor: null,
+            fontSize: 10,
+            customSize: 0,
+            showStack: false,
+            'format-format': "{c}",
+            stackValue: "默认类目",
+            barCategoryGap: "20%",
+            cusbarCategoryGap: 0,
+            areaColor: null,
+            align: "left",
+            verticalAlign: "middle",
+            cusAlignX: 0,
+            cusAlignY: 0,
+            xradio: 0,
+            yradio: 0,
+            z: 2,
+            borderRadius: 0,
+            radius1: 0,
+            radius2: 0,
+            radius3: 0,
+            radius4: 0
+        }]
+    },
+    // pieSeries
+    pieSeries: {
+        pieSelect: 'inside',  //内圈
+        pieType: false,   //饼图类型
+        center: 'center-center',    //饼图位置
+        cuscenter1: 50,
+        cuscenter2: 50,
+        clockwise: true,  //顺时逆时针
+        startAngle: 90,   //起始角度
+        cusAngle: 90,
+        label: {
+            show: true,   //显示数据标签
+            'format-ratio': 1,
+            'format-digit': "auto",
+            'format-format': "{b}",
+            position: 'outside',   //引导线位置
+            fontSize: 12,
+        },
+        labelLine: {
+            show: true,
+            smooth: 0,     //平滑程度
+            lineStyle: {
+                type: 'solid',
+                width: 1,
+            },
+            length: 15,
+            length2: 15
+        },
+        currentIndex: 0,
+        option: [
+            {
+                label: {
+                    show: true,
+                    position: 'outside',
+                    fontSize: 12,
+                },
+                labelLine: {
+                    show: true,
+                    smooth: 0,     //平滑程度
+                    lineStyle: {
+                        type: 'solid',
+                        width: 1,
+                    },
+                    length: 15,
+                    length2: 15
+                }
+            }
+        ]
+    }
 };
+
+// 初始化图表基本设置
+const partComponent = {
+    label: function (product, type, style, comp) {
+        return {
+            fontSize: null,
+            fontStyle: "normal",
+            color: "#333",
+            fontWeight: "normal",
+            // fontFamily: null,
+            fontPlace: "horizen", //horizen水平，vertical垂直
+            textBorderColor: null
+        };
+    },
+    //边框设置,echarts和highcharts都没有整理过
+    border: function (product, type, style, comp) {
+        return {};
+    },
+    //位置设置,echarts和highcharts都没有整理过
+    position: function (product, type, style, comp) {
+        return {};
+    },
+    //图表项设置，相当于echarts的itemStyle、highcharts的marker
+    item: function (product, type, style, comp) {
+        return {
+            color: null,
+            barderColor: "#000",
+            borderWidth: 1,
+            borderType: "solid"
+        };
+    },
+    // 绘制网格设置
+    grid: function (product, type, style) {
+        return {
+            top: "15%",
+            left: "15%",
+            right: "15%",
+            bottom: "15%"
+        };
+    },
+    //线条设置，echarts的lineStyle、highcharts没有归类整理
+    line: function (product, type, style, comp) {
+        return {
+            color: "#333",
+            width: 1,
+            type: "solid"
+        };
+    },
+    axis: function (product, type, style, comp) {
+        return {
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: "#333",
+                    width: 1
+                }
+            },
+            axisTick: {
+                show: true,
+                inside: false,
+                length: 5,
+                lineStyle: {
+                    color: "#999999",
+                    width: 1
+                }
+            },
+            axisLabel: {
+                show: true,
+                rotate: 0
+            },
+            splitLine: {
+                show: false,
+                interval: "auto",
+                lineStyle: {
+                    width: 1,
+                    type: "solid",
+                    color: "#ccc"
+                }
+            },
+            splitArea: {
+                show: false,
+                interval: "auto",
+                areaStyle: {
+                    color: ["rgba(250,250,250,0.3)", "rgba(200,200,200,0.3)"]
+                }
+            }
+        };
+    },
+    // 图表设置
+    config: function (product, type, style) {
+        return {
+            grid: partComponent.grid(product, type, style),
+            color: null,
+            fontFamily: "Sans-serif"
+        };
+    },
+    //x轴设置
+    xAxis: function (product, type, style) {
+        return [{
+            show: true,
+            type: 'category',
+            axisLabel: partComponent.label(product, type, style),
+            axisLine: partComponent.axis(product, type, style).axisLine,
+            axisTick: partComponent.axis(product, type, style).axisTick,
+            nameTextStyle: partComponent.label(product, type, style),
+            splitLine: partComponent.axis(product, type, style).splitLine,
+            splitArea: partComponent.axis(product, type, style).splitArea
+        }, {
+            show: false,
+            type: 'category',
+            label: partComponent.label(product, type, style),
+            axisLine: partComponent.axis(product, type, style).axisLine,
+            axisTick: partComponent.axis(product, type, style).axisTick,
+            nameTextStyle: partComponent.label(product, type, style),
+            splitLine: partComponent.axis(product, type, style).splitLine,
+            splitArea: partComponent.axis(product, type, style).splitArea
+        }];
+    },
+    //y轴设置
+    yAxis: function (product, type, style) {
+        return [
+            {
+                show: true,
+                type: 'value',
+                label: partComponent.label(product, type, style),
+                axisLine: partComponent.axis(product, type, style).axisLine,
+                axisTick: partComponent.axis(product, type, style).axisTick,
+                nameTextStyle: partComponent.label(product, type, style),
+                splitLine: partComponent.axis(product, type, style).splitLine,
+                splitArea: partComponent.axis(product, type, style).splitArea
+            },
+            {
+                show: false,
+                type: 'category',
+                label: partComponent.label(product, type, style),
+                axisLine: partComponent.axis(product, type, style).axisLine,
+                axisTick: partComponent.axis(product, type, style).axisTick,
+                nameTextStyle: partComponent.label(product, type, style),
+                splitLine: partComponent.axis(product, type, style).splitLine,
+                splitArea: partComponent.axis(product, type, style).splitArea
+            }
+        ];
+    },
+    //标题设置
+    title: function (product, type, style) {
+        return {
+            show: false,
+            text: "默认标题",
+            subtext: "",
+            textStyle: partComponent.label(product, type, style)
+        };
+    },
+    //副标题设置
+    subtitle: function (product, type, style) {
+        return {};
+    },
+    //图例设置
+    legend: function (product, type, style) {
+        return {
+            show: false,
+            textStyle: partComponent.label(product, type, style),
+            itemGap: 10,
+            orient: "horizontal",
+            itemStyle: {},
+            itemWidth: 25,
+            itemHeight: 14,
+            x: 0,
+            y: 0
+        };
+    },
+    //提示设置
+    tooltip: function (product, type, style) {
+        var label = deepCopy(
+            partComponent.label(product, type, style, "tooltip")
+        );
+        label.color = "#fff";
+
+        return {
+            show: true,
+            textStyle: label,
+            triggerOn: "mousemove",
+            trigger: "item",
+            axisPointer: {
+                lineStyle: {
+                    color: "#555",
+                    width: 1,
+                    type: "solid"
+                },
+                crossStyle: {
+                    lineStyle: {
+                        color: "#555",
+                        width: 1,
+                        type: "solid"
+                    }
+                },
+                shadowStyle: {
+                    color: "rgba(150,150,150,0.3)"
+                }
+            },
+            backgroundColor: 'rgba(50,50,50,0.7)'
+        };
+    },
+}
 
 //此类数据抽出来作为模板数据,每次使用deepCopy一份即可
 //注: 若页面展示的是语义化的参数,则此处也只定义语义化的参数,具体数值在引擎里做转换
@@ -582,6 +890,46 @@ const fontStyleIB = {
     },
 };
 
+// symbol大小
+const symbolSizeOption = [
+    { value: 2, label: "2px" },
+    { value: 3, label: "3px" },
+    { value: 6, label: "6px" },
+    { value: 8, label: "8px" },
+    { value: 10, label: "10px" },
+    { value: 12, label: "12px" },
+    { value: 14, label: "14px" },
+    { value: 16, label: "16px" },
+    { value: "custom", label: "自定义" },
+]
+
+//   symbol类型
+const symbolOption = [
+    { value: "emptyCircle", label: "空心圆" },
+    { value: "circle", label: "圆" },
+    { value: "emptyRect", label: "空心矩形" },
+    { value: "rect", label: "矩形" },
+    { value: "roundRect", label: "圆角矩形" },
+    { value: "emptyTriangle", label: "空心三角" },
+    { value: "triangle", label: "三角形" },
+    { value: "emptyDiamond", label: "空心菱形" },
+    { value: "diamond", label: "菱形" },
+    { value: "pin", label: "标注" },
+    { value: "arrow", label: "箭头" },
+    { value: "line", label: "直线" },
+]
+
+const symbolOption1 = [
+    { value: "circle", label: "圆" },
+    { value: "rect", label: "矩形" },
+    { value: "roundRect", label: "圆角矩形" },
+    { value: "triangle", label: "三角形" },
+    { value: "diamond", label: "菱形" },
+    { value: "pin", label: "标注" },
+    { value: "arrow", label: "箭头" },
+    { value: "none", label: "无" },
+]
+
 // model data
 const chartModelData = [["地区", "衣服", "食材", "图书"], ["上海", 134, 345, 51], ["北京", 345, 421, 234], ["广州", 453, 224, 156], ["杭州", 321, 634, 213], ["南京", 654, 542, 231]];
 
@@ -613,5 +961,9 @@ export {
     intervalOption,
     fontStyleIBV,
     fontStyleIB,
-    chartOptions
+    chartOptions,
+    symbolSizeOption,
+    symbolOption,
+    symbolOption1,
+    partComponent
 };

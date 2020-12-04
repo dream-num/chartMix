@@ -338,7 +338,7 @@ export default {
     };
   },
   mounted() {
-    if (this.lang == "ch") {
+    if (this.lang == "zh") {
       this.config[0].data = this.echartsCN
       this.close = "关闭图表选择菜单";
       this.chooseConfig();
@@ -366,7 +366,7 @@ export default {
       this.chartAllType = val;
     },
     lang(val) {
-      if (this.lang == "ch") {
+      if (this.lang == "zh") {
         this.config[0].data = this.echartsCN
         this.close = "关闭图表选择菜单";
         this.chooseConfig();
@@ -403,7 +403,7 @@ export default {
         value
       );
       this.$emit('closeChartShowList')
-      this.currentChartType = value;
+      this.chartAllType = value;
     },
     quickListScroll: function (e) {
       var scrollTop = $(e.currentTarget).scrollTop();

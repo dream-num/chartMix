@@ -4,6 +4,8 @@
 
 <script>
 import { renderChart } from '@/utils/chartUtil'
+import isEqual from 'lodash/isEqual'
+
 export default {
   name: "ChartRender",
   props: {
@@ -22,8 +24,8 @@ export default {
   },
   watch: {
       chartOptions: {
-          handler: function(chartOptions) {//此处必须使用function,不能用箭头函数
-            if(!chartOptions){
+          handler: function(chartOptions, old) {//此处必须使用function,不能用箭头函数
+            if(!chartOptions || isEqual(chartOptions, old)){
               return 
             }
               this.renderCharts(chartOptions)

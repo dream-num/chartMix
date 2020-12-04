@@ -6,54 +6,36 @@ import transformTitle from './transformTitle'
 import transformLegend from './transformLegend'
 import transformTooltip from './transformTooltip'
 import transformAxis from './transformAxis'
+import transformCommonSeries from './transformCommonSeries'
+import transformPie from './transformPie'
+import { deepCopy } from '@/utils/util'
+import store from '../../store'
 
-const echartsEngine = function (chartOptions) {
-    //TODO: chartOptions 转换后导出
+const echartsEngine = function (chartOptions, props) {
+    let prop = props ? props : store.state.chartSetting.prop
 
-    const chartAllTypeArray = chartOptions.chartAllType.split('|');
-    const chartPro = chartAllTypeArray[0];
-    const chartType = chartAllTypeArray[1];
-    const chartStyle = chartAllTypeArray[2];
+    if(prop.prop){
+        // 每次操作设置项添加该操作
+        prop.chart_id = chartOptions.chart_id
+        store.dispatch('chartSetting/addProp', prop)
 
-    const titleOption = transformTitle(chartAllTypeArray , chartOptions.defaultOption.title,chartOptions.defaultOption.subtitle)
-    // const configOption = transformConfig(chartOptions.defaultOption.config);
-    const legendOption = transformLegend(chartAllTypeArray , chartOptions.defaultOption.legend)
-    const tooltipOption = transformTooltip(chartAllTypeArray , chartOptions.defaultOption.tooltip)
-    const axisOption = transformAxis(chartAllTypeArray , chartOptions.defaultOption.axis)
-    axisOption.xAxisDown.data = chartOptions.defaultOption.axis.xAxisDown.data
-
-    const option = {
-        title:{...titleOption},
-        tooltip: {
-            ...tooltipOption
-        },
-        legend: {
-            ...legendOption
-        },
-        xAxis: [{
-            ...axisOption.xAxisDown
-        },{
-            ...axisOption.xAxisUp
-        }],
-        yAxis: [
-            axisOption.yAxisLeft,
-            axisOption.yAxisRight
-        ],
-        series: chartOptions.defaultOption.series ? chartOptions.defaultOption.series : [{
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-        }]
-    };
-    // 饼图去掉XY轴
-    if(chartType == 'pie'){
-        delete option.xAxis
-        delete option.yAxis
+        const chartAllTypeArray = chartOptions.chartAllType.split('|');
+        const chartPro = chartAllTypeArray[0];
+        const chartType = chartAllTypeArray[1];
+        const chartStyle = chartAllTypeArray[2];
+    
+        let action = new Map([
+            ['titlePlace', () => transformTitle(chartAllTypeArray , chartOptions.defaultOption.titlePlace, chartOptions.defaultOption.title, prop)],
+            ['subtitlePlace', () => transformTitle(chartAllTypeArray , chartOptions.defaultOption.subtitlePlace, chartOptions.defaultOption.title, prop)],
+            ['legendPlace', () => transformLegend(chartAllTypeArray , chartOptions.defaultOption.legendPlace, chartOptions.defaultOption.legend, prop)],
+            ['commonSeries', () => transformCommonSeries(chartAllTypeArray, chartOptions.defaultOption.commonSeries, chartOptions.defaultOption.series, prop)],
+            ['pieSeries', () => transformPie(chartAllTypeArray, chartOptions.defaultOption.pieSeries, chartOptions.defaultOption.series, prop, flag)]
+        ])
+    
+        action.get(prop.prop.split(':')[0])()
     }
-
-    console.dir(option)
-    console.dir(JSON.stringify(option))
-    return option;
+  
+    return chartOptions.defaultOption;
 }
 
 export default echartsEngine

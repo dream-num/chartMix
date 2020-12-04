@@ -5,9 +5,13 @@ import {
     UPDATE_CHART_ITEM_CHARTLIST,
     UPDATE_CHART_ITEM_ONE,
     UPDATE_CHART_ITEM_CHARTLIST_ONE,
-    IS_UPDATE
+    IS_UPDATE,
+    UPDATE_PROP,
+    UPDATE_RENDER_VIEW,
+    UPDATE_CURRENT_PROP,
+    ADD_PROP
 } from './mutation-types';
-import { setChartOptionsByRouter } from '@/utils/chartUtil';
+import { setChartOptionsByRouter, updateView } from '@/utils/chartUtil';
 import $ from 'jquery'
 
 export default {
@@ -32,10 +36,10 @@ export default {
     [UPDATE_CHART_ITEM](state,params) {
         //子组件设置更新到chartOptions上后再更新到fabric组件上
         console.info('updateObj', params)
-        const { router , updateObj } = params
+        const { router , updateObj , prop} = params
         const currentChartOptions = state.chartLists[state.currentChartIndex].chartOptions;
 
-        setChartOptionsByRouter(currentChartOptions,router , updateObj); //更新到子对象
+        setChartOptionsByRouter(currentChartOptions,router , updateObj, prop); //更新到子对象
     },
     /**
      * 修改state中chartlist
@@ -57,5 +61,32 @@ export default {
      */
     [UPDATE_CHART_ITEM_ONE](state , item){
         state[item.key] = item.value
+    },
+    [UPDATE_PROP](state, params){
+        updateView(state, params)
+    },
+    [UPDATE_RENDER_VIEW](state, params){
+        state.renderView = params
+    },
+    /**
+     * 
+     * @param {*当前更改值} value 
+     * @param {*更改前的值} oldValue 
+     * @param {*更改属性名} prop 
+     * @param {*更改的系列索引} index 
+     * @param {*更改的系列data索引} dataIndex 
+     */
+    [UPDATE_CURRENT_PROP](state, params){
+        state.prop.value = params.value
+        state.prop.oldValue = params.oldValue
+        state.prop.prop = params.prop
+        state.prop.index = params.index
+        state.prop.dataIndex = params.dataIndex
+        state.prop.chart_id = state.currentChartIndex !== null ? state.chartLists[state.currentChartIndex].chart_id : null
+        state.number++
+    },
+    [ADD_PROP](state, params){
+        let index = state.chartLists.findIndex(item => item.chart_id == params.chart_id)
+        state.chartLists[index].porps.push(params)
     }
 };

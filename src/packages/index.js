@@ -2,7 +2,7 @@
 import ChartSetting from './ChartMix/ChartSetting.vue'
 import chartSetting from '../store/modules/chartSetting'
 import ChartRender from './ChartMix/ChartRender.vue'
-import { initChart , createChart , renderChart , highlightChart , deleteChart,  insertToStore , resizeChart , changeChartRange , changeChartCellData , getChartJson } from '../utils/exportUtil'
+import { initChart , createChart , renderChart , highlightChart , deleteChart,  insertToStore , resizeChart , changeChartRange , changeChartCellData , getChartJson, updateChart, restoreChart } from '../utils/exportUtil'
 
 // all components
 const components = [
@@ -57,7 +57,7 @@ export default {
     changeChartCellData,
     renderChart,
     getChartJson,
-    insertToStore
-    // ChartSetting,
-    // ChartRender
+    insertToStore,
+    updateChart,
+    restoreChart
 }

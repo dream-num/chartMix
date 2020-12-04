@@ -3,7 +3,6 @@
     <el-col :span="8" class="title"><slot name="title"></slot></el-col>
     <el-col :span="16">
       <el-switch
-        @change="changeSwitch"
         active-color="#13ce66"
         inactive-color="#d8d8d8"
         v-model="switchData"
@@ -18,25 +17,25 @@ export default {
     switchValue: {
       type: Boolean,
       default: false
-    }
+    },
+    prop: String
   },
   data(){
     return {
-      switchData: false
+      switchData: false,
     }
   },
   watch:{
     switchValue(val){
       this.switchData = val
+    },
+    switchData(val, oldVal){
+      this.$emit('summit', this.prop, val,oldVal)
+      this.$emit('update:switchValue', val);
     }
   },
   mounted() {
     this.switchData = this.switchValue ? this.switchValue : false
-  },
-  methods: {
-    changeSwitch(val) {
-      this.$emit('update:switchValue', val);
-    }
   }
 };
 </script>

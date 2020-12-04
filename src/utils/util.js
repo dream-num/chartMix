@@ -1,4 +1,4 @@
-import { baseComponent } from '@/data/chartJson'
+import { baseComponent, chartComponent } from '@/data/chartJson'
 /**
  * 深度克隆数据,包括对象，数组，map
  * @param {*} obj 对象，数组，map
@@ -1029,7 +1029,7 @@ function addDataToOption(
     chartStyle,
     chartData
 ) {
-
+    defaultOptionIni.type = chartType
     if (
         !!chartDataCache.xAxis && chartType != 'bar'
     ) {
@@ -1095,11 +1095,6 @@ function addDataToOption(
         // echarts默认所需初始数据格式
         if (chartType == 'pie') {
             transformPie(defaultOptionIni, chartDataCache, seriesData, legendData, chartPro, chartType, chartStyle)
-
-
-
-
-            // console.dir(defaultOptionIni)
         } else if (chartType == 'line' || chartType == 'area' || chartType == 'bar' || chartType == 'column') {
             transformCommon(defaultOptionIni, seriesData, legendData, chartPro, chartType, chartStyle)
         }
@@ -1117,6 +1112,10 @@ function transformCommon(defaultOptionIni, seriesData, legendData, chartPro, cha
     for (var i = 0; i < seriesData.length; i++) {
         if (defaultOptionIni.series[i] == null) {
             defaultOptionIni.series[i] = initCommon(defaultOptionIni.series[i], seriesData[i], legendData[i], chartPro, chartType, chartStyle)
+            // 给面积图加个标识
+            if(chartType == 'area'){
+                defaultOptionIni.area = true
+            }
         } else {
             defaultOptionIni.series[i] = editCommon(defaultOptionIni.series[i], seriesData[i], legendData[i], chartPro, chartType, chartStyle)
         }
@@ -1257,6 +1256,13 @@ function transformPie(defaultOptionIni, chartDataCache, seriesData, legendData, 
             value: seriesData[0][i]
         })
     }
+    // 去掉除pieSeries之外的series
+    for(let k in defaultOptionIni){
+        if(k.indexOf('Series') > 0){
+            Reflect.deleteProperty(defaultOptionIni , k)
+        }
+    }
+    defaultOptionIni.pieSeries = chartComponent.pieSeries
 
     for (var i = 0; i < seriesData.length; i++) {
         if (i > 0) {

@@ -293,7 +293,7 @@ export default {
     router: String,
     lang: {
       type: String,
-      default: "cn",
+      default: "zh",
     },
   },
   components: {
@@ -324,7 +324,7 @@ export default {
     };
   },
   mounted() {
-    if (this.lang == "ch") {
+    if (this.lang == "zh") {
       this.setItem = transCN["chartAxis"];
       return;
     }
@@ -358,7 +358,7 @@ export default {
       immediate: true,
     },
     lang(val) {
-      if (val == "ch") {
+      if (val == "zh") {
         this.setItem = transCN["chartAxis"];
         return;
       }

@@ -1,7 +1,7 @@
 import store from '../store'
 import Vue from 'vue'
 import { generateRandomKey, deepCopy, getRowColCheck, getRangeSplitArray, getChartDataCache, getChartDataSeriesOrder, addDataToOption } from '../utils/util'
-import { changeChartRange , changeChartCellData , renderChart } from '../utils/chartUtil'
+import { changeChartRange , changeChartCellData , renderChart, updateChart, getDefaultJson, restoreChart } from '../utils/chartUtil'
 import { chartOptions } from '../data/chartJson'
 import echarts from 'echarts'
 import $ from 'jquery'
@@ -42,23 +42,23 @@ function initChart(outDom, lang) {
  * @param {*} chart_id 图表ID
  * 返回容器/id/chart_json图表配置
  */
-function createChart(render, chartData, chart_id, rangeArray, rangeTxt) {
+function createChart(render, chartData, chart_id, rangeArray, rangeTxt, chartTheme, height, width, left, top, chartAllType) {
 
     let chart_Id = chart_id ? chart_id : generateRandomKey('chart')
     render.id = chart_Id
 
-    chartOptions.defaultOption.series = []
-
     // 随机生成图表
-    let ratio = Math.random() * 10
-    if (ratio > 5) {
-        chartOptions.chartAllType = 'echarts|pie|default'
-    } else {
-        chartOptions.chartAllType = 'echarts|line|default'
-    }
+    // let ratio = Math.random() * 10
+    // if (ratio > 5) {
+    //     chartOptions.chartAllType = 'echarts|pie|default'
+    // } else {
+        // chartOptions.chartAllType = 'echarts|line|default'
+
+        chartAllType = chartAllType ? chartAllType : 'echarts|line|default'
+    // }
 
     // 生成图表数据结构
-    let chartOption = insertNewChart(chartOptions, chart_Id, chartOptions.chartAllType, chartData, rangeArray, rangeTxt)
+    let chartOption = insertNewChart(chartOptions, chart_Id, chartAllType, chartData, rangeArray, rangeTxt, chartTheme, height, width, left, top)
 
     let renderDom = document.createElement('div')
     renderDom.id = 'render' + chart_Id
@@ -72,8 +72,6 @@ function createChart(render, chartData, chart_id, rangeArray, rangeTxt) {
 
     ChartSetting.currentChartIndex = ChartSetting.chartLists.length
     ChartSetting.chartLists.push(chart_json)
-
-    console.dir(chart_json)
 
     new Vue({
         el: '#render' + chart_Id,
@@ -125,6 +123,10 @@ function insertNewChart(
     left,
     top
 ) {
+    // 插入图表时清空prop
+    store.dispatch('chartSetting/updateRenderView', false)
+    store.dispatch('chartSetting/updateCurrentProp', {})
+
     var chart_json = {}
 
     var chartAllTypeArray = chartAllType.split('|')
@@ -145,7 +147,7 @@ function insertNewChart(
     chart_json.top = top
 
     //按照图表类型得到图表的默认设置
-    var defaultOptionIni = chartOptions.defaultOption
+    var defaultOptionIni = Object.assign(chartOptions.defaultOption, getDefaultJson(chartPro, chartType, chartStyle))
     //数据的sheet索引
     chart_json.chartData = chartData
     chart_json.rangeArray = rangeArray
@@ -238,16 +240,19 @@ function resizeChartAll(){
 
 // delete chart
 function deleteChart(chart_id) {
+    store.dispatch('chartSetting/updateRenderView', false)
+
     let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
-    ChartSetting.chartLists.splice(index, 1)
+    let chart = ChartSetting.chartLists.splice(index, 1)
     ChartSetting.currentChartIndex--
     if (ChartSetting.currentChartIndex < 0) {
         if (ChartSetting.chartLists[0]) {
             ChartSetting.currentChartIndex = 0
-            return
+            return chart
         }
         ChartSetting.currentChartIndex = null
     }
+    return chart
 }
 
 function getChartJson(chart_id){
@@ -270,5 +275,7 @@ export {
     changeChartCellData,
     getChartJson,
     renderChart,
-    insertToStore
+    insertToStore,
+    updateChart,
+    restoreChart
 }

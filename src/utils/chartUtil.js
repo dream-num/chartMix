@@ -1,9 +1,10 @@
-import { getChartDataCache,getRowColCheck, getRangeSplitArray, getChartDataSeriesOrder, addDataToOption, deepCopy } from '../utils/util'
+import { getChartDataCache, getRowColCheck, getRangeSplitArray, getChartDataSeriesOrder, addDataToOption, deepCopy } from '../utils/util'
+import { getChartJson } from './exportUtil'
 import echartsEngine from '@/utils/echartsEngine/index'
 import store from '../store'
+import { partComponent } from '@/data/chartJson'
 // import highchartsEngine from './highchartsEngine'
 const echarts = require('echarts');
-
 
 /**
  * update main object's subject attribute by router
@@ -30,7 +31,9 @@ const setChartOptionsByRouter = function (chartOptions, router, updateObj) {
 
     }
     deepFind(defaultOption);
-    renderChart({chartOptions: chartOptions})
+
+    store.dispatch('chartSetting/updateRenderView', false)
+    renderChart({ chartOptions: chartOptions })
     return chartOptions;
 }
 
@@ -39,16 +42,43 @@ const setChartOptionsByRouter = function (chartOptions, router, updateObj) {
  * 
  */
 const renderChart = function (renderChartObj, ele) {
-    let chartOptions = renderChartObj.chartOptions
-    let chart_id = chartOptions.chart_id
-    // const { chart_id, chartOptions } = renderChartObj;
+    if (!store.state.chartSetting.renderView) {
+        let chartOptions = renderChartObj.chartOptions
+        let chart_id = chartOptions.chart_id
+        // const { chart_id, chartOptions } = renderChartObj;
+        const chartAllTypeArray = chartOptions.chartAllType.split('|');
+        const chartPro = chartAllTypeArray[0];
+        // const container = ele || document.getElementById(chart_id);
+        const container = document.getElementById(chart_id);
+
+        if (chartPro === 'echarts') {
+            const options = echartsEngine(chartOptions);
+
+            let chart = echarts.getInstanceByDom(container);
+            if (chart == null) {
+                chart = echarts.init(container)
+            }
+
+            chart.setOption(options, true);
+
+            console.dir(JSON.stringify(options))
+            console.dir(options)
+
+            setTimeout(() => {
+                echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
+            }, 0);
+        }
+    }
+}
+
+const updateChart = function (props) {
+    let chartOptions = getChartJson(props.chart_id)
     const chartAllTypeArray = chartOptions.chartAllType.split('|');
     const chartPro = chartAllTypeArray[0];
-    // const container = ele || document.getElementById(chart_id);
-    const container = document.getElementById(chart_id);
+    const container = document.getElementById(props.chart_id);
 
     if (chartPro === 'echarts') {
-        const options = echartsEngine(chartOptions);
+        const options = echartsEngine(chartOptions, props);
 
         let chart = echarts.getInstanceByDom(container);
         if (chart == null) {
@@ -56,6 +86,56 @@ const renderChart = function (renderChartObj, ele) {
         }
 
         chart.setOption(options, true);
+
+        chartOptions.defaultOption = options
+        store.dispatch('chartSetting/updateChartItemChartlist', chartOptions)
+        store.dispatch('chartSetting/updateRenderView', true)
+
+        setTimeout(() => {
+            echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
+        }, 0);
+    }
+}
+
+// 按操作步骤渲染图表
+const restoreChart = function(option){
+    let chartOptions = option.chartOptions
+    const chartAllTypeArray = chartOptions.chartAllType.split('|');
+    const chartPro = chartAllTypeArray[0];
+    const container = document.getElementById(option.chart_id);
+
+    if(option.props && option.props.length){
+        for(let i = 0; i < option.props.length; i++){
+            let options = echartsEngine(chartOptions, option.props[i]);
+    
+            let chart = echarts.getInstanceByDom(container);
+            if (chart == null) {
+                chart = echarts.init(container)
+            }
+    
+            chart.setOption(options, true);
+    
+            chartOptions.defaultOption = options
+            store.dispatch('chartSetting/updateChartItemChartlist', chartOptions)
+            store.dispatch('chartSetting/updateRenderView', true)
+    
+            setTimeout(() => {
+                echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
+            }, 0);
+        }
+    }else{
+        let options = echartsEngine(chartOptions);
+    
+        let chart = echarts.getInstanceByDom(container);
+        if (chart == null) {
+            chart = echarts.init(container)
+        }
+
+        chart.setOption(options, true);
+
+        chartOptions.defaultOption = options
+        store.dispatch('chartSetting/updateChartItemChartlist', chartOptions)
+        store.dispatch('chartSetting/updateRenderView', true)
 
         setTimeout(() => {
             echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
@@ -67,6 +147,7 @@ const renderChart = function (renderChartObj, ele) {
  * textStyle转化
  */
 const transTextStyle = function (origin, result, attr, attr1) {
+    result[attr] = result[attr] ? result[attr] : {}
     // fontGroup
     let fontGroupList = ['bold', 'vertical', 'italic'];
     origin.label.fontGroup.forEach(element => {
@@ -232,6 +313,8 @@ const transCustom = function (a, b) {
 
 // changecharttype
 const changeChangeAllType = function (chart_json, chartAllType) {
+    store.dispatch('chartSetting/updateRenderView', false)
+
     var chartID = chart_json.chart_id;
     var chart_id = chartID;
 
@@ -286,6 +369,8 @@ const changeChangeAllType = function (chart_json, chartAllType) {
 
 // 行/列标题操作以及转置操作
 const checkCurrentBoxChange = function (chart_id, rangeRowCheck, rangeColCheck, rangeConfigCheck) {
+    store.dispatch('chartSetting/updateRenderView', false)
+
     var state = store.state;
 
     var updateJson = deepCopy(state.chartSetting.chartLists[state.chartSetting.currentChartIndex].chartOptions) //原来的json
@@ -336,6 +421,8 @@ const checkCurrentBoxChange = function (chart_id, rangeRowCheck, rangeColCheck, 
 
 //系列数据顺序变化
 const changeSeriesOrder = function (chart_json, chartDataSeriesOrder) {
+    store.dispatch('chartSetting/updateRenderView', false)
+
     if (chart_json == null) {
         return;
     }
@@ -364,8 +451,11 @@ function changeChartRange(
     chart_id,
     chartData,
     rangeArray,
-    rangeTxt
+    rangeTxt,
+    rangeSplitArray
 ) {
+    store.dispatch('chartSetting/updateRenderView', false)
+
     let index = store.state.chartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
     store.state.chartSetting.currentChartIndex = index
 
@@ -398,12 +488,12 @@ function changeChartRange(
     chart_json.rangeConfigCheck = rangeConfigCheck;
 
     //按照数据范围文字得到具体数据范围
-    var rangeSplitArray = getRangeSplitArray(
-        chartData,
-        rangeArray,
-        rangeColCheck,
-        rangeRowCheck
-    );
+    // var rangeSplitArray = getRangeSplitArray(
+    //     chartData,
+    //     rangeArray,
+    //     rangeColCheck,
+    //     rangeRowCheck
+    // );
     chart_json.rangeSplitArray = rangeSplitArray;
 
     //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
@@ -443,6 +533,7 @@ function changeChartRange(
 }
 
 function changeChartCellData(chart_id, chartData) {
+    store.dispatch('chartSetting/updateRenderView', false)
 
     let index = store.state.chartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
     store.state.chartSetting.currentChartIndex = index
@@ -509,6 +600,96 @@ function changeChartCellData(chart_id, chartData) {
     renderChart({ chartOptions: chart_json, chart_id: chart_id })
 }
 
+/**
+ * 撤销重做更新视图
+ */
+const updateView = function (state, params) {
+    if (params.prop.value !== undefined) {
+        state.prop = params.prop
+        let index = state.chartLists.findIndex(item => item.chart_id == params.prop.chart_id)
+        let prop = params.prop.prop
+        let obj = state.chartLists[index].chartOptions.defaultOption[prop.split(':')[0]]
+        // 如果是系列
+        if (params.prop.index !== undefined) {
+            obj = obj.option[params.prop.index]
+        }
+
+        if (!prop.includes('.')) {
+            obj[prop.split(':')[1]] = params.prop.value
+        } else {
+            let arr = params.prop.prop.split(':')[1].split('.')
+            function repeat(obj, arr) {
+                for (let i = 0; i < arr.length; i++) {
+                    if (i != arr.length - 1) {
+                        let field = arr[0]
+                        arr.shift()
+                        repeat(obj[field], arr)
+                    } else {
+                        value = obj[arr[0]]
+                    }
+                }
+            }
+
+            if (arr[0] == 'data') {
+                arr.splice(0, 1)
+                repeat(obj.option[params.prop.dataIndex], arr)
+            } else {
+                repeat(obj, arr)
+            }
+        }
+
+    }
+}
+
+const getDefaultJson = function (product, type, style) {
+    var ret = {};
+    if (
+        type == "line" ||
+        type == "area" ||
+        type == "column" ||
+        type == "scatter"
+    ) {
+        ret.textStyle = {};
+        ret.config = partComponent.config(product, type, style);
+        ret.xAxis = partComponent.xAxis(product, type, style);
+        ret.yAxis = partComponent.yAxis(product, type, style);
+        ret.title = partComponent.title(product, type, style);
+        ret.subtitle = partComponent.subtitle(product, type, style);
+        ret.legend = partComponent.legend(product, type, style);
+        ret.tooltip = partComponent.tooltip(product, type, style);
+        ret.series = [];
+    } else if (type == "bar") {
+        ret.textStyle = {};
+        ret.config = partComponent.config(product, type, style);
+        ret.xAxis = partComponent.yAxis(product, type, style);
+        ret.yAxis = partComponent.xAxis(product, type, style);
+        ret.title = partComponent.title(product, type, style);
+        ret.subtitle = partComponent.subtitle(product, type, style);
+        ret.legend = partComponent.legend(product, type, style);
+        ret.tooltip = partComponent.tooltip(product, type, style);
+        ret.series = [];
+    } else if (
+        type == "pie" ||
+        type == "radar" ||
+        type == "funnel" ||
+        type == "gauge"
+    ) {
+        ret.textStyle = {};
+        ret.config = partComponent.config(product, type, style);
+        ret.title = partComponent.title(product, type, style);
+        ret.subtitle = partComponent.subtitle(product, type, style);
+        ret.legend = partComponent.legend(product, type, style);
+        ret.tooltip = partComponent.tooltip(product, type, style);
+        ret.series = [];
+    }
+    if (product == "echarts") {
+        ret.markpoint = [];
+        ret.markline = [];
+        ret.markarea = [];
+    }
+    return ret;
+}
+
 export {
     setChartOptionsByRouter,
     renderChart,
@@ -520,5 +701,9 @@ export {
     checkCurrentBoxChange,
     changeSeriesOrder,
     changeChartRange,
-    changeChartCellData
+    changeChartCellData,
+    updateChart,
+    updateView,
+    getDefaultJson,
+    restoreChart
 }

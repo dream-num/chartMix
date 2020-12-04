@@ -1,7 +1,7 @@
 <template>
     <el-row >
-        <!-- 加粗 / 斜体 / 垂直-->
-        <el-checkbox-group v-model="boxValue" @change="changeStyle" size="mini">
+        <el-col :span="6" v-if="showCol"><slot name="title"></slot></el-col>
+        <el-checkbox-group v-model="boxValue" size="mini">
             <el-tooltip v-for="(value,name) in checkboxOption" :key="name" :open-delay="500" :content="value.des" effect="dark" placement="bottom">
                 <el-checkbox-button :label="name"> {{value.text}} </el-checkbox-button>
             </el-tooltip>
@@ -16,26 +16,31 @@ export default {
         boxData: {
             type: Array,
             default: []
-        }
+        },
+        showCol: {
+            type: Boolean,
+            default: false
+        },
+        prop: String
     },
     data(){
         return {
-            boxValue: ''
+            boxValue: '',
+            oldVal: ''
         }
     },
     watch: {
-        boxData(val){
+        boxData(val, oldVal){
             this.boxValue = val
+        },
+        boxValue(val, oldVal){
+           this.$emit('summit', this.prop, val,oldVal)
+            this.$emit('update:boxData', val)
         }
     },
     mounted(){
         this.boxValue = this.boxData ? deepCopy(this.boxData) : []
     },
-    methods: {
-        changeStyle(val){
-            this.$emit('update:boxData' , val)
-        }
-    }
 }
 </script>
 <style>

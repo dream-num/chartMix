@@ -1,53 +1,59 @@
 <template>
   <div>
     <!-- 需要el-row -->
-    <el-row style="margin-top:15px;" v-if="!hideCol">
+    <el-row style="margin-top: 15px" v-if="!hideCol">
       <el-col :span="8" class="title"><slot name="input"></slot></el-col>
       <el-col :span="16">
         <el-input
-          @change="changeInput"
           :placeholder="placeholder"
           size="mini"
           suffix-icon="el-icon-edit"
           v-model="input"
-          :type="type?type:'text'"
+          :type="type ? type : 'text'"
         ></el-input>
       </el-col>
     </el-row>
     <!-- 不需要el-row -->
-    <el-input v-else :type="type?type:'text'" @change="changeInput" :placeholder="placeholder" size="mini" v-model="input"></el-input>
+    <el-input
+      v-else
+      :type="type ? type : 'text'"
+      :placeholder="placeholder"
+      size="mini"
+      v-model="input"
+    ></el-input>
   </div>
 </template>
 <script>
 export default {
-  name: 'chart-base-input',
+  name: "chart-base-input",
   props: {
     placeholder: {
       type: String,
-      default: ''
+      default: "",
     },
-    inputValue: '',
+    inputValue: "",
     hideCol: Boolean,
-    type: String
+    type: String,
+    prop: String,
   },
-  data(){
+  data() {
     return {
-      input: ''
-    }
+      input: "",
+      oldVal: "",
+    };
   },
   watch: {
-    inputValue(val){
-      this.input = val
-    }
+    inputValue(val, oldVal) {
+      this.input = val;
+    },
+    input(val, oldVal) {
+      this.$emit("summit", this.prop,val, oldVal);
+      this.$emit("update:inputValue", val);
+    },
   },
   mounted() {
-    this.input = this.inputValue ? this.inputValue : ''
+    this.input = this.inputValue ? this.inputValue : "";
   },
-  methods: {
-    changeInput(val){
-      this.$emit('update:inputValue' , val)
-    }
-  }
 };
 </script>
 <style>

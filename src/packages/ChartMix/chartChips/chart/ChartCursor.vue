@@ -125,7 +125,7 @@ export default {
     cursorOption: Object,
     lang: {
       type: String,
-      default: "cn",
+      default: "zh",
     },
   },
   data() {
@@ -155,7 +155,7 @@ export default {
     };
   },
   mounted() {
-    if (this.lang == "ch") {
+    if (this.lang == "zh") {
       this.setItem = transCN["chartCursor"];
       return;
     }
@@ -183,7 +183,7 @@ export default {
       immediate: true,
     },
     lang(val) {
-      if (val == "ch") {
+      if (val == "zh") {
         this.setItem = transCN["chartCursor"];
         return;
       }

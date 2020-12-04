@@ -36,7 +36,7 @@
             <el-tab-pane label="ToolBar" name="ToolBar">
                 <ToolBar ></ToolBar>
             </el-tab-pane>
-            <el-tab-pane label="ChartSetting" name="ChartSetting" style="height: 500px;">
+            <el-tab-pane label="ChartSetting" name="ChartSetting" style="height: 1000px;">
                 <div class="chartsetting-container">
                     <ChartSetting :chartOptions="currentChartOptions" ></ChartSetting>
                 </div>
@@ -178,5 +178,8 @@
     .chartsetting-container {
         width: 100%;
         height: 100%;
+    }
+    .settingPanel{
+        height: 1000px;
     }
 </style>

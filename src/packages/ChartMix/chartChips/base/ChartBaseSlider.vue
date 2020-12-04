@@ -11,7 +11,6 @@
             show-input
             style="padding-left: 12px;"
             v-model="baseSliderData"
-            @change="handlerChange"
             :format-tooltip="format?formatter:null"
           ></el-slider>
         </el-tooltip>
@@ -30,7 +29,6 @@
             show-input
             style="padding-left: 12px;"
             v-model="baseSliderData"
-            @change="handlerChange"
             :format-tooltip="format?formatter:null"
           ></el-slider>
         </el-tooltip>
@@ -59,25 +57,27 @@ export default {
       default: "滑动修改值大小"
     },
     hideCol: false,
-    format: [Function , String]
+    format: [Function , String],
+    prop: String
   },
   data() {
     return {
-      baseSliderData: 12
+      baseSliderData: 12,
     };
   },
   watch:{
-    baseSliderOption(val){
+    baseSliderOption(val, oldVal){
       this.baseSliderData = val
+    },
+    baseSliderData(val, oldVal){
+      this.$emit('summit', this.prop,val, oldVal)
+      this.$emit("update:baseSliderOption", val);
     }
   },
   mounted() {
     this.baseSliderData = this.baseSliderOption;
   },
   methods: {
-    handlerChange(value) {
-      this.$emit("update:baseSliderOption", value);
-    },
     formatter(val){
       // eval(this.format)
       return null

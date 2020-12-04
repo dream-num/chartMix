@@ -1,23 +1,36 @@
 <template>
   <el-collapse-item name="3">
-        <template slot="title">
-      {{setItem.modalName}}
+    <template slot="title">
+      {{ setItem.modalName }}
       <i class="iconfont icon-biaoti"></i>
     </template>
 
     <!-- 图例显示 -->
-    <chart-base-switch :switchValue.sync="legend.show">
+    <chart-base-switch
+      :prop="'show'"
+      @summit="summit(arguments)"
+      :switchValue.sync="legend.show"
+    >
       <div slot="title">显示图例</div>
     </chart-base-switch>
 
     <div v-show="legend.show">
       <!-- 图例样式  -->
-      <chart-base-label :router="router + '/label'" :baseLabelOption.sync="legend.label">
+      <chart-base-label
+        :prop="'legendPlace:label'"
+        :router="router + '/label'"
+        :baseLabelOption.sync="legend.label"
+      >
         <div slot="title">图例样式</div>
       </chart-base-label>
 
       <!-- 图例位置/朝向-->
-      <chart-base-select :selectOption="positionOption" :selectValue.sync="legend.position.value">
+      <chart-base-select
+        :prop="'position.value'"
+        @summit="summit(arguments)"
+        :selectOption="positionOption"
+        :selectValue.sync="legend.position.value"
+      >
         <div slot="select">图例位置</div>
       </chart-base-select>
 
@@ -25,6 +38,8 @@
       <el-row v-if="legend.position.value === 'custom'">
         <!-- 水平偏移量 -->
         <chart-base-slider
+          :prop="'position.offsetX'"
+          @summit="summit(arguments)"
           :baseSliderOption.sync="legend.position.offsetX"
           :unit="'%'"
           :content="'滑动修改水平偏移量'"
@@ -32,32 +47,53 @@
 
         <!-- 垂直偏移量 -->
         <chart-base-slider
+          :prop="'position.offsetX'"
+          @summit="summit(arguments)"
           :baseSliderOption.sync="legend.position.offsetY"
           :unit="'%'"
           :content="'滑动修改垂直偏移量'"
         ></chart-base-slider>
       </el-row>
 
-      <chart-base-select :selectOption="dirOptions" :selectValue.sync="legend.position.direction">
+      <chart-base-select
+        :prop="'position.direction'"
+        @summit="summit(arguments)"
+        :selectOption="dirOptions"
+        :selectValue.sync="legend.position.direction"
+      >
         <div slot="select">图例朝向</div>
       </chart-base-select>
 
       <!-- 图例大小 -->
-      <chart-base-select :selectOption="sizeOption" :selectValue.sync="legend.width.value">
+      <chart-base-select
+        :prop="'width.value'"
+        @summit="summit(arguments)"
+        :selectOption="sizeOption"
+        :selectValue.sync="legend.width.value"
+      >
         <div slot="select">图例宽度</div>
       </chart-base-select>
-      <chart-base-select :selectOption="sizeOption" :selectValue.sync="legend.height.value">
+      <chart-base-select
+        :prop="'height.value'"
+        @summit="summit(arguments)"
+        :selectOption="sizeOption"
+        :selectValue.sync="legend.height.value"
+      >
         <div slot="select">图例高度</div>
       </chart-base-select>
 
       <!-- 自定义图例大小 -->
       <chart-base-slider
+        :prop="'width.cusSize'"
+        @summit="summit(arguments)"
         v-if="legend.width.value == 'custom'"
         :baseSliderOption.sync="legend.width.cusSize"
         :unit="'px'"
         :content="'滑动修改图例宽度'"
       ></chart-base-slider>
       <chart-base-slider
+        :prop="'height.cusSize'"
+        @summit="summit(arguments)"
         v-if="legend.height.value == 'custom'"
         :baseSliderOption.sync="legend.height.cusSize"
         :unit="'px'"
@@ -65,12 +101,19 @@
       ></chart-base-slider>
 
       <!-- 图例间距 -->
-      <chart-base-select :selectOption="distanceOption" :selectValue.sync="legend.distance.value">
+      <chart-base-select
+        :prop="'distance.value'"
+        @summit="summit(arguments)"
+        :selectOption="distanceOption"
+        :selectValue.sync="legend.distance.value"
+      >
         <div slot="select">图例间距</div>
       </chart-base-select>
 
       <!-- 自定义图例间距 -->
       <chart-base-slider
+        :prop="'distance.cusGap'"
+        @summit="summit(arguments)"
         v-if="legend.distance.value == 'custom'"
         :baseSliderOption.sync="legend.distance.cusGap"
         :unit="'px'"
@@ -95,7 +138,7 @@ export default {
     router: String,
     lang: {
       type: String,
-      default: "cn",
+      default: "zh",
     },
   },
   data() {
@@ -108,14 +151,14 @@ export default {
         { value: "horizontal", label: "水平" },
         { value: "vertical", label: "垂直" },
       ],
-      setItem:{}
+      setItem: {},
     };
   },
   components: {
     ...t.importComp(t),
   },
   mounted() {
-    if (this.lang == "ch") {
+    if (this.lang == "zh") {
       this.setItem = transCN["chartLegend"];
       return;
     }
@@ -143,7 +186,7 @@ export default {
       immediate: true,
     },
     lang(val) {
-      if (val == "ch") {
+      if (val == "zh") {
         this.setItem = transCN["chartLegend"];
         return;
       }
@@ -151,13 +194,24 @@ export default {
     },
   },
   methods: {
-    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    ...t.mapActions("chartSetting", ["updateChartItem", "updateCurrentProp"]),
     changeLegend() {
+      let prop = {
+        prop: "legendPlace:" + this.prop,
+        oldValue: this.oldVal,
+        value: this.curVal,
+      };
       const updateObj = {
         updateObj: t.deepCopy(this.legend),
         router: this.router,
       };
+      this.updateCurrentProp(prop);
       this.updateChartItem(updateObj);
+    },
+    summit(val) {
+      this.prop = val[0];
+      this.curVal = val[1];
+      this.oldVal = val[2];
     },
   },
 };

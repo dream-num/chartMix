@@ -2,28 +2,46 @@
   <!-- 主标题设置 -->
   <el-collapse-item name="1">
     <template slot="title">
-      {{setItem.modalName}}
+      {{ setItem.modalName }}
       <i class="iconfont icon-biaoti"></i>
     </template>
 
     <!-- 显示标题 -->
-    <chart-base-switch :switchValue.sync="title.show">
-      <div slot="title">{{setItem.show}}</div>
+    <chart-base-switch
+      :switchValue.sync="title.show"
+      :prop="'show'"
+      @summit="summit(arguments)"
+    >
+      <div slot="title">{{ setItem.show }}</div>
     </chart-base-switch>
 
     <!-- 标题内容 -->
-    <chart-base-input :inputValue.sync="title.text" :placeholder="setItem.placeholder">
-      <div slot="input">{{setItem.text}}</div>
+    <chart-base-input
+      :inputValue.sync="title.text"
+      :placeholder="setItem.placeholder"
+      :prop="'text'"
+      @summit="summit(arguments)"
+    >
+      <div slot="input">{{ setItem.text }}</div>
     </chart-base-input>
 
     <!-- 字体样式 -->
-    <chart-base-label :router="router + '/label'" :baseLabelOption.sync="title.label">
-      <div slot="title">{{setItem.label}}</div>
+    <chart-base-label
+      :router="router + '/label'"
+      :baseLabelOption.sync="title.label"
+      :prop="'titlePlace:label'"
+    >
+      <div slot="title">{{ setItem.label }}</div>
     </chart-base-label>
 
     <!-- 标题位置 -->
-    <chart-base-select :selectOption="positionData" :selectValue.sync="title.position.value">
-      <div slot="select">{{setItem.position}}</div>
+    <chart-base-select
+      :selectOption="positionData"
+      :selectValue.sync="title.position.value"
+      :prop="'position.value'"
+      @summit="summit(arguments)"
+    >
+      <div slot="select">{{ setItem.position }}</div>
     </chart-base-select>
 
     <!-- 自定义位置 -->
@@ -32,6 +50,8 @@
       <chart-base-slider
         :baseSliderOption.sync="title.position.offsetX"
         :unit="'%'"
+        :prop="'position.offsetX'"
+        @summit="summit(arguments)"
         :content="setItem.offsetL"
       ></chart-base-slider>
 
@@ -39,6 +59,8 @@
       <chart-base-slider
         :baseSliderOption.sync="title.position.offsetY"
         :unit="'%'"
+        :prop="'position.offsetY'"
+        @summit="summit(arguments)"
         :content="setItem.offsetT"
       ></chart-base-slider>
     </el-row>
@@ -59,14 +81,14 @@ export default {
     titleOption: Object,
     lang: {
       type: String,
-      default: "cn",
+      default: "zh",
     },
   },
   components: {
     ...t.importComp(t),
   },
   mounted() {
-    if (this.lang == "ch") {
+    if (this.lang == "zh") {
       this.setItem = transCN["chartTitle"];
       return;
     }
@@ -77,7 +99,9 @@ export default {
       title: "", //整个title设置,
       positionData: positionOption,
       isChange: false,
-      setItem:{}
+      setItem: {},
+      oldVal: '',
+      prop: null
     };
   },
   watch: {
@@ -109,7 +133,7 @@ export default {
       immediate: true,
     },
     lang(val) {
-      if (val == "ch") {
+      if (val == "zh") {
         this.setItem = transCN["chartTitle"];
         return;
       }
@@ -117,13 +141,24 @@ export default {
     },
   },
   methods: {
-    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    ...t.mapActions("chartSetting", ["updateChartItem", 'updateCurrentProp']),
     changeTitle() {
+      let prop = {
+        prop: 'titlePlace:' + this.prop,
+        oldValue: this.oldVal,
+        value: this.curVal
+      }
       const updateObj = {
         updateObj: t.deepCopy(this.title),
         router: this.router,
       };
+      this.updateCurrentProp(prop)
       this.updateChartItem(updateObj);
+    },
+    summit(val) {
+      this.prop = val[0];
+      this.curVal = val[1]
+      this.oldVal = val[2];
     },
   },
 };

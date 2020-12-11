@@ -1,35 +1,56 @@
 <template>
   <el-collapse-item name="4">
     <template slot="title">
-      {{setItem.modalName}}
+      {{ setItem.modalName }}
       <i class="iconfont icon-biaoti"></i>
     </template>
     <!-- 显示提示框 -->
-    <chart-base-switch :switchValue.sync="cursor.show">
-      <div slot="title">{{setItem.show}}</div>
+    <chart-base-switch
+      :switchValue.sync="cursor.show"
+      @summit="summit(arguments)"
+      :prop="'show'"
+    >
+      <div slot="title">{{ setItem.show }}</div>
     </chart-base-switch>
 
     <!-- 提示框样式 -->
-    <chart-base-label :router="router + '/label'" :baseLabelOption="cursor.label">
-      <div slot="title">{{setItem.label}}</div>
+    <chart-base-label
+      :router="router + '/label'"
+      :baseLabelOption="cursor.label"
+      :prop="'cursorPlace:label'"
+    >
+      <div slot="title">{{ setItem.label }}</div>
     </chart-base-label>
 
     <!-- 背景颜色 -->
-    <el-row style="margin-top: 10px;">
-      <el-col :span="6">{{setItem.background}}</el-col>
+    <el-row style="margin-top: 10px">
+      <el-col :span="6">{{ setItem.background }}</el-col>
       <el-col :span="3">
-        <el-color-picker size="mini" v-model="cursor.backgroundColor"></el-color-picker>
+        <el-color-picker
+          size="mini"
+          v-model="cursor.backgroundColor"
+        ></el-color-picker>
       </el-col>
     </el-row>
 
     <!-- 提示触发条件 -->
-    <chart-base-select :selectOption="triggerMethodArr" :selectValue.sync="cursor.triggerOn">
-      <div slot="select">{{setItem.trigger}}</div>
+    <chart-base-select
+      :selectOption="triggerMethodArr"
+      :selectValue.sync="cursor.triggerOn"
+      :prop="'triggerOn'"
+      @summit="summit(arguments)"
+    >
+      <div slot="select">{{ setItem.trigger }}</div>
     </chart-base-select>
 
     <!-- 提示触发类型 -->
-    <chart-base-select :selectOption="triggerTypeArr" :selectValue.sync="cursor.triggerType">
-      <div slot="select">{{setItem.type}}</div>
+    <chart-base-select
+      :selectOption="triggerTypeArr"
+      :selectValue.sync="cursor.triggerType"
+      :prop="'triggerType'"
+      @summit="summit(arguments)"
+    >
+      <div slot="select">{{ setItem.type }}</div>
     </chart-base-select>
 
     <!-- 指示器配置 -->
@@ -37,23 +58,35 @@
       <chart-base-select
         :selectOption="lineStyleOption"
         :selectValue.sync="cursor.axisPointer.style.type"
+        :prop="'axisPointer.style.type'"
+        @summit="summit(arguments)"
       >
-        <div slot="select">{{setItem.lineType}}</div>
+        <div slot="select">{{ setItem.lineType }}</div>
       </chart-base-select>
       <chart-base-select
         :selectOption="lineWeightOption"
         :selectValue.sync="cursor.axisPointer.style.width"
+        :prop="'axisPointer.style.width'"
+        @summit="summit(arguments)"
       >
-        <div slot="select">{{setItem.lineWidth}}</div>
+        <div slot="select">{{ setItem.lineWidth }}</div>
       </chart-base-select>
-      <el-row style="margin-top: 15px;">
-        <el-col :span="6">{{setItem.color}}</el-col>
+      <el-row style="margin-top: 15px">
+        <el-col :span="6">{{ setItem.color }}</el-col>
         <el-col :span="3">
-          <el-color-picker size="mini" v-model="cursor.axisPointer.style.color"></el-color-picker>
+          <el-color-picker
+            size="mini"
+            v-model="cursor.axisPointer.style.color"
+          ></el-color-picker>
         </el-col>
       </el-row>
-      <chart-base-select :selectOption="axisPointerArr" :selectValue.sync="cursor.axisPointer.type">
-        <div slot="select">{{setItem.axisType}}</div>
+      <chart-base-select
+        :selectOption="axisPointerArr"
+        :selectValue.sync="cursor.axisPointer.type"
+        :prop="'axisPointer.type'"
+        @summit="summit(arguments)"
+      >
+        <div slot="select">{{ setItem.axisType }}</div>
       </chart-base-select>
     </div>
 
@@ -62,23 +95,31 @@
       v-if="cursor.triggerType == 'item'"
       :selectOption="posOption"
       :selectValue.sync="cursor.position"
+      :prop="'position'"
+      @summit="summit(arguments)"
     >
-      <div slot="select">{{setItem.position}}</div>
+      <div slot="select">{{ setItem.position }}</div>
     </chart-base-select>
 
     <!-- 鼠标提示format -->
-    <el-row style="margin-top: 15px;">
+    <el-row style="margin-top: 15px">
       <el-col :span="2">
         <i class="el-icon-menu"></i>
       </el-col>
-      <el-col :span="8">{{setItem.suffix}}</el-col>
+      <el-col :span="8">{{ setItem.suffix }}</el-col>
     </el-row>
 
-    <el-row :key="i" style="margin-top: 15px;" v-for="(item , i) in seriesOption">
-      <el-col :span="6">{{item}}</el-col>
+    <el-row :key="i" style="margin-top: 15px" v-for="(item, i) in seriesOption">
+      <el-col :span="6">{{ item }}</el-col>
       <el-col :span="4">
         <!-- 鼠标提示后缀 -->
-        <chart-base-input :hideCol="true" :placeholder="setItem.placeholder"></chart-base-input>
+        <chart-base-input
+          :hideCol="true"
+          :placeholder="setItem.placeholder"
+          :inputValue.sync="cursor.format[i].suffix"
+          :prop="'format.suffix'"
+          @summit="summit(arguments)"
+        ></chart-base-input>
       </el-col>
       <el-col :span="6">
         <!-- 数值比例 -->
@@ -87,6 +128,8 @@
           :selectOption="ratioOption"
           :selectValue.sync="cursor.format[i].ratio"
           :hideCol="true"
+          :prop="'format.ratio'"
+          @summit="summit(arguments)"
         ></chart-base-select>
       </el-col>
       <el-col :span="6">
@@ -96,6 +139,8 @@
           :selectOption="digitOption"
           :selectValue.sync="cursor.format[i].digit"
           :hideCol="true"
+          :prop="'format.digit'"
+          @summit="summit(arguments)"
         ></chart-base-select>
       </el-col>
     </el-row>
@@ -200,13 +245,24 @@ export default {
     },
   },
   methods: {
-    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    ...t.mapActions("chartSetting", ["updateChartItem", "updateCurrentProp"]),
     changeCursor() {
+      let prop = {
+        prop: "cursorPlace:" + this.prop,
+        oldValue: this.oldVal,
+        value: this.curVal,
+      };
       const updateObj = {
         updateObj: t.deepCopy(this.cursor),
         router: this.router,
       };
+      this.updateCurrentProp(prop);
       this.updateChartItem(updateObj);
+    },
+    summit(val) {
+      this.prop = val[0];
+      this.curVal = val[1];
+      this.oldVal = val[2];
     },
   },
 };

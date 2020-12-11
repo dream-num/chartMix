@@ -443,7 +443,7 @@ const chartComponent = {
             barCategoryGap: "20%",
             cusbarCategoryGap: 0,
             showLabel: false,
-            'format-ratio': "1",
+            'format-ratio': 1,
             'format-digit': "auto",
             'format-prefix': "",
             'format-suffix': "",

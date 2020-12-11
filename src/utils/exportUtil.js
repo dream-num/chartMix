@@ -67,7 +67,8 @@ function createChart(render, chartData, chart_id, rangeArray, rangeTxt, chartThe
     let chart_json = {
         'chart_id': chart_Id,
         'active': true,
-        'chartOptions': deepCopy(chartOption)
+        'chartOptions': deepCopy(chartOption),
+        'props': []
     }
 
     ChartSetting.currentChartIndex = ChartSetting.chartLists.length

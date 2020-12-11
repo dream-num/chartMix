@@ -1035,47 +1035,47 @@ function addDataToOption(
     ) {
         //由于配置可能来自已经让用户配置过的项，所以为了不丢失选项，更新数据的时候需要进行判断。如果是象限数据为空、象限数据与需要更新的数据大小不一致，则全量更新。否则深入到每一项进行更新。以下同
         if (
-            defaultOptionIni.axis.xAxisDown.data == null ||
-            defaultOptionIni.axis.xAxisDown.data.length == 0 ||
-            defaultOptionIni.axis.xAxisDown.data.length != chartDataCache.xAxis.length
+            defaultOptionIni.xAxis[0].data == null ||
+            defaultOptionIni.xAxis[0].data.length == 0 ||
+            defaultOptionIni.xAxis[0].data.length != chartDataCache.xAxis.length
         ) {
-            defaultOptionIni.axis.xAxisDown.data = chartDataCache.xAxis
+            defaultOptionIni.xAxis[0].data = chartDataCache.xAxis
 
         } else {
-            for (var i = 0; i < defaultOptionIni.axis.xAxisDown.data.length; i++) {
-                var cell = defaultOptionIni.axis.xAxisDown.data[i]
+            for (var i = 0; i < defaultOptionIni.xAxis[0].data.length; i++) {
+                var cell = defaultOptionIni.xAxis[0].data[i]
                 if (cell instanceof Object) {
                     cell.value = chartDataCache.xAxis[i]
                 } else {
-                    defaultOptionIni.axis.xAxisDown.data[i] = chartDataCache.xAxis[i]
+                    defaultOptionIni.xAxis[0].data[i] = chartDataCache.xAxis[i]
                 }
             }
         }
-        defaultOptionIni.axis.xAxisDown.type = 'category'
-        defaultOptionIni.axis.yAxisLeft.type = 'value'
+        defaultOptionIni.xAxis[0].type = 'category'
+        defaultOptionIni.yAxis[0].type = 'value'
     }
 
     if (
         chartPro == 'echarts' && chartType == 'bar'
     ) {
         if (
-            defaultOptionIni.axis.yAxisLeft.data == null ||
-            defaultOptionIni.axis.yAxisLeft.data.length == 0 ||
-            defaultOptionIni.axis.yAxisLeft.data.length != chartDataCache.xAxis.length
+            defaultOptionIni.yAxis[0].data == null ||
+            defaultOptionIni.yAxis[0].data.length == 0 ||
+            defaultOptionIni.yAxis[0].data.length != chartDataCache.xAxis.length
         ) {
-            defaultOptionIni.axis.yAxisLeft.data = chartDataCache.xAxis
+            defaultOptionIni.yAxis[0].data = chartDataCache.xAxis
         } else {
-            for (var i = 0; i < defaultOptionIni.axis.yAxisLeft.data.length; i++) {
-                var cell = defaultOptionIni.axis.yAxisLeft.data[i]
+            for (var i = 0; i < defaultOptionIni.yAxis[0].data.length; i++) {
+                var cell = defaultOptionIni.yAxis[0].data[i]
                 if (cell instanceof Object) {
                     cell.value = chartDataCache.xAxis[i]
                 } else {
-                    defaultOptionIni.axis.yAxisLeft.data[i] = chartDataCache.xAxis[i]
+                    defaultOptionIni.yAxis[0].data[i] = chartDataCache.xAxis[i]
                 }
             }
         }
-        defaultOptionIni.axis.yAxisLeft.type = 'category'
-        defaultOptionIni.axis.xAxisDown.type = 'value'
+        defaultOptionIni.yAxis[0].type = 'category'
+        defaultOptionIni.xAxis[0].type = 'value'
     }
 
     if (!!chartDataCache.series) {

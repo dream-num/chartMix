@@ -1,78 +1,138 @@
 /**
  * 鼠标提示转换
  */
-import { transTextStyle , floatTool} from '@/utils/chartUtil'
-const transformTooltip = function (chartAllTypeArray, tooltip) {
-    const resTooltip = {
-        show: true,
-        trigger: 'item',
-        textStyle: {
-            color: '#fff',
-            fontStyle: 'normal',
-            fontWeight: 'normal',
-            fontSize: 14
-        },
-        backgroundColor: 'rgba(50,50,50,0.7)',
-        triggerOn: 'mousemove|click',
-        axisPointer: {
-            type: 'line',
-            lineStyle: {
-                type: 'solid',
-                width: 1,
-                color: '#555'
-            }
-        },
-        position: 'right'
-    }
-    // tooltip.show
-    resTooltip.show = tooltip.show
-    // 触发类型
-    resTooltip.trigger = tooltip.triggerType
-    // 触发条件
-    resTooltip.triggerOn = tooltip.triggerOn
-    // 文字样式
-    transTextStyle(tooltip, resTooltip, 'textStyle')
-    // 背景色
-    resTooltip.backgroundColor = tooltip.backgroundColor
-    // 指示器配置
-    resTooltip.axisPointer.lineStyle = tooltip.axisPointer.style
-    resTooltip.axisPointer.type = tooltip.axisPointer.type
-    // 提示框位置
-    resTooltip.position = tooltip.position == 'auto' ? null : tooltip.position
-    // 提示formatter
-    let format = tooltip.format
-    let formatter1 = function (params) {
-        console.dir(params)
-        let str = params[0].name + "<br>"
-        for (var i = 0; i < params.length; i++) {
-            if(format[params[i].seriesIndex].digit == 'auto'){
-                params[i].value = floatTool.multiply(+params[i].value,format[params[i].seriesIndex].ratio) + format[params[i].seriesIndex].suffix
-            }else{
-                params[i].value = floatTool.multiply(+params[i].value,format[params[i].seriesIndex].ratio).toFixed(format[params[i].seriesIndex].digit) + format[params[i].seriesIndex].suffix
-            }
+import $ from 'jquery'
 
-            str += "<div style='border-radius: 50%;display: inline-block;width: 10px; height: 10px; background-color:" + params[i].color + "'></div>&nbsp;" + params[i].seriesName + ":&nbsp;&nbsp;" + params[i].value + "<br>";
+function transform(prop, value, tooltipPlace) {
+    let obj = {
+        attr: null,
+        result: value,
+        tooltipPlace
+    }
+
+    let final = {}
+
+    let action = new Map([
+        ['show', () => getAttr(obj, 'show', final)],
+        ['triggerOn', () => getAttr(obj, 'triggerOn', final)],
+        ['triggerType', () => getAttr(obj, 'trigger', final)],
+        ['backgroundColor', () => getAttr(obj, 'backgroundColor', final)],
+        ['axisPointer.style.type', () => final = getFullAttr(obj, 'axisPointer.lineStyle.type')],
+        ['axisPointer.style.width', () => final = getFullAttr(obj, 'axisPointer.lineStyle.width')],
+        ['axisPointer.style.color', () => final = getFullAttr(obj, 'axisPointer.lineStyle.color')],
+        ['axisPointer.type', () => final = getFullAttr(obj, 'axisPointer.type')],
+        ['position', () => {
+            value == 'auto' ? getAttr(obj, 'trigger', final, null) : getAttr(obj, 'trigger', final)
+        }],
+        ['label.fontSize', () => {
+            final = getFullAttr(obj, 'textStyle.fontSize')
+        }],
+        ['label.fontGroup', () => {
+            let fontWeight, fontStyle
+            if (value.includes('bold')) {
+                fontWeight = getFullAttr(obj, 'textStyle.fontWeight', 'bold')
+            } else {
+                fontWeight = getFullAttr(obj, 'textStyle.fontWeight', 'normal')
+            }
+            if (value.includes('italic')) {
+                fontStyle = getFullAttr(obj, 'textStyle.fontStyle', 'italic')
+            } else {
+                fontStyle = getFullAttr(obj, 'textStyle.fontStyle', 'normal')
+            }
+            $.extend(true, final, fontWeight, fontStyle)
+        }],
+        ['label.fontSize', () => {
+            final = getFullAttr(obj, 'textStyle.fontSize')
+        }],
+        ['label.color', () => {
+            final = getFullAttr(obj, 'textStyle.color')
+        }]
+    ])
+
+    action.get(prop)()
+
+    return final
+}
+
+// 属性赋值
+function getAttr(obj, attr, final, value) {
+    obj.attr = attr
+    if (value) {
+        final[obj.attr] = value
+    } else {
+        final[obj.attr] = obj.result
+    }
+}
+
+function getFullAttr(obj, attr, value) {
+    let arr = attr.split('.')
+    let final = {}
+
+    function repeat(obj, final, value) {
+        for (let i = 0; i < arr.length; i++) {
+            if (i != arr.length - 1) {
+                let field = arr[0]
+                if (!Reflect.has(final, field)) {
+                    final[field] = {}
+                }
+                arr.shift()
+                repeat(obj, final[field], value)
+            } else {
+                if (value) {
+                    final[arr[0]] = value
+                } else {
+                    final[arr[0]] = obj.result
+                }
+            }
         }
-        return str
+    }
+    repeat(obj, final, value)
+    return final
+}
+
+function setValue(attr, data, value) {
+    if (attr.includes('.')) {
+        let arr = attr.split('.')
+        repeat(data, arr)
+    } else {
+        data[attr] = value
     }
 
-    // let formatter2 = function (params) {
-    //     if(format[params.seriesIndex].digit == 'auto'){
-    //         params.value = floatTool.multiply(+params.value, format[params.seriesIndex].ratio) + format[params.seriesIndex].suffix
-    //     }else{
-    //         params.value = floatTool.multiply(+params.value, format[params.seriesIndex].ratio).toFixed(format[params.seriesIndex].digit) + format[params.seriesIndex].suffix
-    //     }
-    //     let str = params.seriesName + "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + params.name + ":&nbsp;&nbsp;" + params.value;
-    //     return str
-    // }
+    function repeat(data, arr) {
+        for (let i = 0; i < arr.length; i++) {
+            if (i != arr.length - 1) {
+                let field = arr[0]
+                if (!Reflect.has(data, field)) {
+                    data[field] = {}
+                }
+                arr.shift()
+                repeat(data[field], arr)
+            } else {
+                data[arr[0]] = value
+            }
+        }
+    }
+}
 
-    // let actions = new Map([
-    //     ['item' , formatter2],
-    //     ['axis' , formatter1]
-    // ]) 
-    // resTooltip.formatter = actions.get(resTooltip.trigger)
+const transformTooltip = function (chartAllTypeArray, tooltipPlace, tooltip, props) {
+    const chartPro = chartAllTypeArray[0];
+    const chartType = chartAllTypeArray[1];
+    const chartStyle = chartAllTypeArray[2];
+    let prop
+    let result
+    let value
 
-    return resTooltip
+    prop = props.prop.split(':')[1]
+    if (props.reverse) {
+        value = props.oldValue
+    } else {
+        value = props.value
+    }
+
+    setValue(prop, tooltipPlace, value)
+    result = transform(prop, value, tooltipPlace)
+
+    $.extend(true, tooltip, result)
 }
 
 export default transformTooltip

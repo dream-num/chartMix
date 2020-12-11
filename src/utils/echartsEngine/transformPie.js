@@ -221,51 +221,28 @@ function formatData(format) {
     return fun
 }
 
-const transformPie = function (chartAllTypeArray, pieSeries, series) {
+const transformPie = function (chartAllTypeArray, seriesPlace, series, props) {
     const chartPro = chartAllTypeArray[0];
     const chartType = chartAllTypeArray[1];
     const chartStyle = chartAllTypeArray[2];
 
-    // 更新当前修改的属性
-    let prop = pieSeries.prop 
-    let index = pieSeries.currentIndex - 1
+    let prop
+    let result
     let value
-    if(prop){
-        prop = pieSeries.prop
-        if(prop == 'cuscenter'){
-            value = [pieSeries['cuscenter1'], pieSeries['cuscenter2']]
-        }else{
-            if(prop.includes('.')){
-                let arr = prop.split('.')
+    let index = seriesPlace.currentIndex - 1
 
-                function repeat(pieSeries, arr){
-                    for(let i = 0; i < arr.length; i++){
-                        if(i != arr.length - 1){
-                            let field = arr[0]
-                            arr.shift()
-                            repeat(pieSeries[field], arr)
-                        }else{
-                            value = pieSeries[arr[0]]
-                        }
-                    }
-                }
-
-                if(arr[0] == 'data'){
-                    arr.splice(0 , 1)
-                    repeat(pieSeries.option[index], arr)
-                }else{
-                    repeat(pieSeries, arr)
-                }
-
-            }else{
-                value = pieSeries[prop]       
-            }
-        }
-        let result = transform(prop, value, deepCopy(series[0]), index)
-        Object.assign(series[0], result)
+    prop = props.prop.split(':')[1]
+    if (props.reverse) {
+        value = props.oldValue
+    } else {
+        value = props.value
     }
 
-    return series
+    setValue(prop, seriesPlace, value)
+
+    result = transform(prop, value, deepCopy(series[0]), index)
+    $.extend(true, series[0], result)
+
 }
 
 export default transformPie

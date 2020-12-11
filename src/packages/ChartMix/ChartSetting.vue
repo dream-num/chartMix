@@ -1,6 +1,6 @@
 <template>
   <div class="chartSetting">
-    <div style="overflow: hidden;height: 100%;">
+    <div style="overflow: auto;height: 100%;">
       <!-- 图表类型 -->
       <chart-list
         :chartAllType="currentChartType"
@@ -163,34 +163,34 @@
                   ></chart-sub-title>
 
                   <!-- 鼠标提示组件 -->
-                  <!-- <chart-cursor
+                  <chart-cursor
                     :router="'tooltip'"
                     :chartAllType="currentChartType"
                     :cursorOption="cursorOption"
                     :lang="lang"
-                  ></chart-cursor> -->
+                  ></chart-cursor>
 
                   <!-- 图例组件 -->
-                  <!-- <chart-legend
+                  <chart-legend
                     :router="'legend'"
                     :chartAllType="currentChartType"
                     :legendOption="legendOption"
                     :lang="lang"
-                  ></chart-legend> -->
+                  ></chart-legend>
 
                   <!-- 坐标轴组件 -->
-                  <!-- <chart-axis
+                  <chart-axis
                     v-if="chart_type !='pie'"
                     :router="'axis'"
                     :axisOption="axisOption"
                     :chartAllType="currentChartType"
                     :lang="lang"
-                  ></chart-axis> -->
+                  ></chart-axis>
 
                   <!-- 系列组件 -->
                   <chart-echarts-series :router="'commonSeries'" :lang="lang" v-if="echartsCommon" :seriesOptionData="seriesOptionData" :chartAllType="currentChartType"></chart-echarts-series>
                   <!-- 饼图系列 -->
-                  <!-- <chart-pie-series :router="'pieSeries'" :lang="lang" v-if="chart_type == 'pie'" :pieOptionData="pieOptionData" :chartAllType="currentChartType"></chart-pie-series> -->
+                  <chart-pie-series :router="'pieSeries'" :lang="lang" v-if="chart_type == 'pie'" :pieOptionData="pieOptionData" :chartAllType="currentChartType"></chart-pie-series>
 
                 </el-collapse>
               </el-col>

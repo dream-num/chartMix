@@ -83,10 +83,19 @@
 
     // let span = document.getElementsByTagName('span')[0]
 
-    let a 
-    let b = {
-        ...a
-    }
+    // let a 
+    // let b = {
+    //     ...a
+    // }
+
+
+    let action = new Map([
+        [new RegExp(/a/), () => alert(1)],
+        ['a', () => alert(2)]
+    ])
+    console.dir(action.get('a'))
+    action.get('a')()
+
 </script>
 
 </html>

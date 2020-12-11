@@ -133,6 +133,29 @@ function getStyle(obj, desc, field, final, value) {
     getAttr(obj, desc, final)
 }
 
+function setValue(attr, data, value) {
+    if (attr.includes('.')) {
+        let arr = attr.split('.')
+        repeat(data, arr)
+    } else {
+        data[attr] = value
+    }
+
+    function repeat(data, arr) {
+        for (let i = 0; i < arr.length; i++) {
+            if (i != arr.length - 1) {
+                let field = arr[0]
+                if (!Reflect.has(data, field)) {
+                    data[field] = {}
+                }
+                arr.shift()
+                repeat(data[field], arr)
+            } else {
+                data[arr[0]] = value
+            }
+        }
+    }
+}
 // formatter转换
 function formatData(format) {
     let fun
@@ -160,31 +183,34 @@ function formatData(format) {
     return fun
 }
 
-const transformCommonSeries = function (chartAllTypeArray, series, props) {
+const transformCommonSeries = function (chartAllTypeArray, seriesPlace, series, props) {
     const chartPro = chartAllTypeArray[0];
     const chartType = chartAllTypeArray[1];
     const chartStyle = chartAllTypeArray[2];
 
-    // 更新当前修改的属性
     let prop
+    let result
     let value
+
     prop = props.prop.split(':')[1]
     if (props.reverse) {
         value = props.oldValue
     } else {
         value = props.value
     }
-    if (!props.index) {
+
+    setValue(prop, seriesPlace, value)
+
+    if (!prop.index) {
         for (let i = 0; i < series.length; i++) {
-            let result = transform(prop, value, series[i])
-            Object.assign(series[i], result)
+            result = transform(prop, value, series[i])
+            $.extend(true, series[i], result)
         }
     } else {
-        let result = transform(prop, value, series[props.index - 1])
-        Object.assign(series[props.index - 1], result)
+        result = transform(prop, value, series[props.index - 1])
+        $.extend(true, series[props.index - 1], result)
     }
 
-    return series
 }
 
 export default transformCommonSeries

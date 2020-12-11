@@ -3,11 +3,10 @@
  */
 import $ from 'jquery'
 
-function transform(prop, value, legengPlace) {
+function transform(prop, value) {
     let obj = {
         attr: null,
-        result: value,
-        legengPlace
+        result: value
     }
 
     let final = {}
@@ -165,7 +164,7 @@ const transformLegend = function (chartAllTypeArray, legendPlace, legend, props)
     }
 
     setValue(prop, legendPlace, value)
-    result = transform(prop, value, legendPlace)
+    result = transform(prop, value)
 
     $.extend(true, legend, result)
 }

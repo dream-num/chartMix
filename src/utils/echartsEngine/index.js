@@ -28,11 +28,33 @@ const echartsEngine = function (chartOptions, props) {
             ['titlePlace', () => transformTitle(chartAllTypeArray , chartOptions.defaultOption.titlePlace, chartOptions.defaultOption.title, prop)],
             ['subtitlePlace', () => transformTitle(chartAllTypeArray , chartOptions.defaultOption.subtitlePlace, chartOptions.defaultOption.title, prop)],
             ['legendPlace', () => transformLegend(chartAllTypeArray , chartOptions.defaultOption.legendPlace, chartOptions.defaultOption.legend, prop)],
+            ['cursorPlace', () => transformTooltip(chartAllTypeArray , chartOptions.defaultOption.tooltipPlace, chartOptions.defaultOption.tooltip, prop)],
+            ['axis', () => {
+                let axis
+                let target = prop.prop.split(':')[0].split('-')[1]
+                let axisPlace = chartOptions.defaultOption.axis[target]
+
+                if(target == 'xAxisDown'){
+                    axis = chartOptions.defaultOption.xAxis[0]
+                }else if(target == 'xAxisUp'){
+                    axis = chartOptions.defaultOption.xAxis[1]
+                }else if(target == 'yAxisLeft'){
+                    axis = chartOptions.defaultOption.yAxis[0]
+                }else {
+                    axis = chartOptions.defaultOption.yAxis[1]
+                }
+
+                transformAxis(chartAllTypeArray, axisPlace, axis, prop)
+            }],
             ['commonSeries', () => transformCommonSeries(chartAllTypeArray, chartOptions.defaultOption.commonSeries, chartOptions.defaultOption.series, prop)],
-            ['pieSeries', () => transformPie(chartAllTypeArray, chartOptions.defaultOption.pieSeries, chartOptions.defaultOption.series, prop, flag)]
+            ['pieSeries', () => transformPie(chartAllTypeArray, chartOptions.defaultOption.pieSeries, chartOptions.defaultOption.series, prop)]
         ])
-    
-        action.get(prop.prop.split(':')[0])()
+        
+        let attr = prop.prop.split(':')[0]
+        if(attr.includes('axis')){
+            attr = 'axis'
+        }
+        action.get(attr)()
     }
   
     return chartOptions.defaultOption;

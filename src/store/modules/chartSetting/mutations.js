@@ -87,6 +87,6 @@ export default {
     },
     [ADD_PROP](state, params){
         let index = state.chartLists.findIndex(item => item.chart_id == params.chart_id)
-        state.chartLists[index].porps.push(params)
+        state.chartLists[index].props.push(params)
     }
 };

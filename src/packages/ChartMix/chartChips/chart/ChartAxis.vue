@@ -1,38 +1,63 @@
 <template>
   <el-collapse-item name="6">
     <template slot="title">
-      {{setItem.modalName}}
+      {{ setItem.modalName }}
       <i class="iconfont icon-biaoti"></i>
     </template>
     <!-- 选择坐标轴 -->
-    <chart-base-select :selectOption="axisGroup" :selectValue.sync="axis.axisType">
-      <div slot="select">{{setItem.select}}</div>
+    <chart-base-select
+      :selectOption="axisGroup"
+      :selectValue.sync="axis.axisType"
+    >
+      <div slot="select">{{ setItem.select }}</div>
     </chart-base-select>
     <!-- 是否显示坐标轴 -->
-    <chart-base-switch :switchValue.sync="series.show">
-      <div slot="title">{{series.name}}</div>
+    <chart-base-switch
+      :switchValue.sync="series.show"
+      :prop="'show'"
+      @summit="summit(arguments)"
+    >
+      <div slot="title">{{ series.name }}</div>
     </chart-base-switch>
 
     <div v-show="series.show">
       <!-- 标题内容 -->
-      <chart-base-input :inputValue.sync="series.title.text" :placeholder="setItem.placeholder">
-        <div slot="input">{{setItem.text}}</div>
+      <chart-base-input
+        :inputValue.sync="series.title.text"
+        :placeholder="setItem.placeholder"
+        :prop="'title.text'"
+        @summit="summit(arguments)"
+      >
+        <div slot="input">{{ setItem.text }}</div>
       </chart-base-input>
 
-      <div style="margin-top: 15px;" v-show="series.title.text">
+      <div style="margin-top: 15px" v-show="series.title.text">
         <!-- 文本样式 -->
-        <chart-base-label :router="router + '/label'" :baseLabelOption.sync="series.title.label">
-          <div slot="title">{{setItem.label}}</div>
+        <chart-base-label
+          :router="router + '/label'"
+          :baseLabelOption.sync="series.title.label"
+          :prop="'axisPlace:label'"
+        >
+          <div slot="title">{{ setItem.label }}</div>
         </chart-base-label>
         <!-- 文本对齐方式 -->
-        <chart-base-select :selectOption="fzPosOption" :selectValue.sync="series.title.fzPosition">
-          <div slot="select">{{setItem.align}}</div>
+        <chart-base-select
+          :selectOption="fzPosOption"
+          :selectValue.sync="series.title.fzPosition"
+          :prop="'title.fzPosition'"
+          @summit="summit(arguments)"
+        >
+          <div slot="select">{{ setItem.align }}</div>
         </chart-base-select>
       </div>
 
       <!-- 反向坐标轴 -->
-      <chart-base-switch :switchValue.sync="series.inverse">
-        <div slot="title">{{setItem.reverse}}</div>
+      <chart-base-switch
+        :switchValue.sync="series.inverse"
+        :prop="'inverse'"
+        @summit="summit(arguments)"
+      >
+        <div slot="title">{{ setItem.reverse }}</div>
       </chart-base-switch>
 
       <!-- 坐标轴间隔数 -->
@@ -42,8 +67,10 @@
         :baseSliderOption.sync="series.tickLabel.optimize"
         :unit="'个'"
         :content="setItem.content"
+        :prop="'tickLabel.optimize'"
+        @summit="summit(arguments)"
       >
-        <div slot="title">{{setItem.intenval}}</div>
+        <div slot="title">{{ setItem.intenval }}</div>
       </chart-base-slider>
 
       <div v-show="series.title.text">
@@ -53,26 +80,34 @@
           :baseSliderOption.sync="series.title.nameGap"
           :unit="'px'"
           :content="setItem.content1"
+          :prop="'title.nameGap'"
+          @summit="summit(arguments)"
         >
-          <div slot="title">{{setItem.gap}}</div>
+          <div slot="title">{{ setItem.gap }}</div>
         </chart-base-slider>
         <!-- 倾斜轴标题 -->
         <chart-base-slider
           :hideCol="true"
-          :format="formatRotation+''"
+          :format="formatRotation + ''"
           :max="180"
           :min="-180"
           :baseSliderOption.sync="series.title.rotate"
           :unit="'°'"
           :content="setItem.content2"
+          :prop="'title.rotate'"
+          @summit="summit(arguments)"
         >
-          <div slot="title">{{setItem.title}}</div>
+          <div slot="title">{{ setItem.title }}</div>
         </chart-base-slider>
       </div>
 
       <!-- 显示刻度线 -->
-      <chart-base-switch :switchValue.sync="series.tickLine.show">
-        <div slot="title">{{setItem.showLine}}</div>
+      <chart-base-switch
+        :switchValue.sync="series.tickLine.show"
+        :prop="'tickLine.show'"
+        @summit="summit(arguments)"
+      >
+        <div slot="title">{{ setItem.showLine }}</div>
       </chart-base-switch>
 
       <!-- 刻度线宽度 -->
@@ -82,27 +117,46 @@
         :baseSliderOption.sync="series.tickLine.width"
         :unit="'px'"
         :content="setItem.content3"
+        :prop="'tickLine.width'"
+        @summit="summit(arguments)"
       >
-        <div slot="title">{{setItem.lineWidth}}</div>
+        <div slot="title">{{ setItem.lineWidth }}</div>
       </chart-base-slider>
       <!-- 刻度线颜色 -->
-      <el-row style="margin-top:15px;">
-        <el-col :span="7" class="title">{{setItem.lineColor}}</el-col>
+      <el-row style="margin-top: 15px">
+        <el-col :span="7" class="title">{{ setItem.lineColor }}</el-col>
         <el-col :push="14" :span="3">
-          <el-tooltip :open-delay="500" :content="setItem.lineColor" effect="dark" placement="bottom">
-            <el-color-picker size="mini" v-model="series.tickLine.color"></el-color-picker>
+          <el-tooltip
+            :open-delay="500"
+            :content="setItem.lineColor"
+            effect="dark"
+            placement="bottom"
+          >
+            <el-color-picker
+              size="mini"
+              v-model="series.tickLine.color"
+            ></el-color-picker>
           </el-tooltip>
         </el-col>
       </el-row>
 
       <!-- 显示刻度 -->
-      <chart-base-switch :switchValue.sync="series.tick.show">
-        <div slot="title">{{setItem.showTick}}</div>
+      <chart-base-switch
+        :switchValue.sync="series.tick.show"
+        :prop="'tick.show'"
+        @summit="summit(arguments)"
+      >
+        <div slot="title">{{ setItem.showTick }}</div>
       </chart-base-switch>
 
       <!-- 刻度位置 -->
-      <chart-base-select :selectOption="orient" :selectValue.sync="series.tick.position">
-        <div slot="select">{{setItem.position}}</div>
+      <chart-base-select
+        :selectOption="orient"
+        :selectValue.sync="series.tick.position"
+        :prop="'tick.position'"
+        @summit="summit(arguments)"
+      >
+        <div slot="select">{{ setItem.position }}</div>
       </chart-base-select>
 
       <!-- 刻度长度 -->
@@ -112,8 +166,10 @@
         :baseSliderOption.sync="series.tick.length"
         :unit="'px'"
         :content="setItem.content4"
+        :prop="'tick.length'"
+        @summit="summit(arguments)"
       >
-        <div slot="title">{{setItem.tickLength}}</div>
+        <div slot="title">{{ setItem.tickLength }}</div>
       </chart-base-slider>
 
       <!-- 刻度宽度 -->
@@ -124,22 +180,36 @@
         :baseSliderOption.sync="series.tick.width"
         :unit="'px'"
         :content="setItem.content5"
+        :prop="'tick.width'"
+        @summit="summit(arguments)"
       >
-        <div slot="title">{{setItem.tickWidth}}</div>
+        <div slot="title">{{ setItem.tickWidth }}</div>
       </chart-base-slider>
       <!-- 刻度颜色 -->
-      <el-row style="margin-top:15px;">
-        <el-col :span="6" class="title">{{setItem.tickColor}}</el-col>
+      <el-row style="margin-top: 15px">
+        <el-col :span="6" class="title">{{ setItem.tickColor }}</el-col>
         <el-col :push="14" :span="4">
-          <el-tooltip :open-delay="500" :content="setItem.tickColor" effect="dark" placement="bottom">
-            <el-color-picker size="mini" v-model="series.tick.color"></el-color-picker>
+          <el-tooltip
+            :open-delay="500"
+            :content="setItem.tickColor"
+            effect="dark"
+            placement="bottom"
+          >
+            <el-color-picker
+              size="mini"
+              v-model="series.tick.color"
+            ></el-color-picker>
           </el-tooltip>
         </el-col>
       </el-row>
 
       <!-- 显示刻度标签 -->
-      <chart-base-switch :switchValue.sync="series.tickLabel.show">
-        <div slot="title">{{setItem.showLabel}}</div>
+      <chart-base-switch
+        :switchValue.sync="series.tickLabel.show"
+        :prop="'tickLabel.show'"
+        @summit="summit(arguments)"
+      >
+        <div slot="title">{{ setItem.showLabel }}</div>
       </chart-base-switch>
 
       <!-- 倾斜标签 -->
@@ -151,8 +221,10 @@
         :baseSliderOption.sync="series.tickLabel.rotate"
         :unit="'°'"
         :content="setItem.content6"
+        :prop="'tickLabel.rotate'"
+        @summit="summit(arguments)"
       >
-        <div slot="title">{{setItem.rotate}}</div>
+        <div slot="title">{{ setItem.rotate }}</div>
       </chart-base-slider>
 
       <!-- Y轴有数据编辑 -->
@@ -162,39 +234,67 @@
           :type="'text'"
           :inputValue.sync="series.tickLabel.min"
           :placeholder="setItem.content7"
+          :prop="'tickLabel.min'"
+          @summit="summit(arguments)"
         >
-          <div slot="input">{{setItem.min}}</div>
+          <div slot="input">{{ setItem.min }}</div>
         </chart-base-input>
         <!-- 刻度最大值 -->
         <chart-base-input
           :type="'text'"
           :inputValue.sync="series.tickLabel.max"
           :placeholder="setItem.content8"
+          :prop="'tickLabel.max'"
+          @summit="summit(arguments)"
         >
-          <div slot="input">{{setItem.max}}</div>
+          <div slot="input">{{ setItem.max }}</div>
         </chart-base-input>
         <!-- 数值缩放比例 -->
-        <chart-base-select :selectOption="ratioOption" :selectValue.sync="series.tickLabel.ratio">
-          <div slot="select">{{setItem.ratio}}</div>
+        <chart-base-select
+          :selectOption="ratioOption"
+          :selectValue.sync="series.tickLabel.ratio"
+          :prop="'format-ratio'"
+          @summit="summit(arguments)"
+        >
+          <div slot="select">{{ setItem.ratio }}</div>
         </chart-base-select>
         <!-- 小数位数 -->
-        <chart-base-select :selectOption="digitOption" :selectValue.sync="series.tickLabel.digit">
-          <div slot="select">{{setItem.digit}}</div>
+        <chart-base-select
+          :selectOption="digitOption"
+          :selectValue.sync="series.tickLabel.digit"
+          :prop="'format-digit'"
+          @summit="summit(arguments)"
+        >
+          <div slot="select">{{ setItem.digit }}</div>
         </chart-base-select>
       </div>
 
       <!-- 标签前缀 -->
-      <chart-base-input :inputValue.sync="series.tickLabel.prefix" :placeholder="setItem.content9">
-        <div slot="input">{{setItem.prefix}}</div>
+      <chart-base-input
+        :inputValue.sync="series.tickLabel.prefix"
+        :placeholder="setItem.content9"
+        :prop="'format-prefix'"
+        @summit="summit(arguments)"
+      >
+        <div slot="input">{{ setItem.prefix }}</div>
       </chart-base-input>
       <!-- 标签后缀 -->
-      <chart-base-input :inputValue.sync="series.tickLabel.suffix" :placeholder="setItem.content10">
-        <div slot="input">{{setItem.suffix}}</div>
+      <chart-base-input
+        :inputValue.sync="series.tickLabel.suffix"
+        :placeholder="setItem.content10"
+        :prop="'format-suffix'"
+        @summit="summit(arguments)"
+      >
+        <div slot="input">{{ setItem.suffix }}</div>
       </chart-base-input>
 
       <!-- 显示网格线 -->
-      <chart-base-switch :switchValue.sync="series.netLine.show">
-        <div slot="title">{{setItem.showNet}}</div>
+      <chart-base-switch
+        :switchValue.sync="series.netLine.show"
+        :prop="'netLine.show'"
+        @summit="summit(arguments)"
+      >
+        <div slot="title">{{ setItem.showNet }}</div>
       </chart-base-switch>
 
       <div v-show="series.netLine.show">
@@ -206,19 +306,35 @@
           :baseSliderOption.sync="series.netLine.width"
           :unit="'px'"
           :content="setItem.content11"
+          :prop="'netLine.width'"
+          @summit="summit(arguments)"
         >
-          <div slot="title">{{setItem.netWidth}}</div>
+          <div slot="title">{{ setItem.netWidth }}</div>
         </chart-base-slider>
         <!-- 网格线类型 -->
-        <chart-base-select :selectOption="lineStyleOption" :selectValue.sync="series.netLine.type">
-          <div slot="select">{{setItem.netType}}</div>
+        <chart-base-select
+          :selectOption="lineStyleOption"
+          :selectValue.sync="series.netLine.type"
+          :prop="'netLine.type'"
+          @summit="summit(arguments)"
+        >
+          <div slot="select">{{ setItem.netType }}</div>
         </chart-base-select>
         <!-- 网格线颜色 -->
-        <el-row style="margin-top:15px;">
-          <el-col :span="8" class="title">{{setItem.netColor}}</el-col>
+        <el-row style="margin-top: 15px">
+          <el-col :span="8" class="title">{{ setItem.netColor }}</el-col>
           <el-col :push="13" :span="3">
-            <el-tooltip :open-delay="500" :content="setItem.netColor" effect="dark" placement="bottom">
-              <el-color-picker :label="true" size="mini" v-model="series.netLine.color"></el-color-picker>
+            <el-tooltip
+              :open-delay="500"
+              :content="setItem.netColor"
+              effect="dark"
+              placement="bottom"
+            >
+              <el-color-picker
+                :label="true"
+                size="mini"
+                v-model="series.netLine.color"
+              ></el-color-picker>
             </el-tooltip>
           </el-col>
         </el-row>
@@ -226,8 +342,10 @@
         <chart-base-select
           :selectOption="intervalOption"
           :selectValue.sync="series.netLine.interval.value"
+          :prop="'netLine.interval.value'"
+          @summit="summit(arguments)"
         >
-          <div slot="select">{{setItem.netInterval}}</div>
+          <div slot="select">{{ setItem.netInterval }}</div>
         </chart-base-select>
         <!-- 自定义间隔数 -->
         <chart-base-slider
@@ -235,20 +353,28 @@
           :baseSliderOption.sync="series.netLine.interval.cusNumber"
           :unit="'个'"
           :content="setItem.content12"
+          :prop="'netLine.interval.cusNumber'"
+          @summit="summit(arguments)"
         ></chart-base-slider>
       </div>
 
       <!-- 显示网格区域 -->
-      <chart-base-switch :switchValue.sync="series.netArea.show">
-        <div slot="title">{{setItem.showArea}}</div>
+      <chart-base-switch
+        :switchValue.sync="series.netArea.show"
+        :prop="'netArea.show'"
+        @summit="summit(arguments)"
+      >
+        <div slot="title">{{ setItem.showArea }}</div>
       </chart-base-switch>
       <div v-show="series.netArea.show">
         <!-- 网格区域分割间隔数 -->
         <chart-base-select
           :selectOption="intervalOption"
           :selectValue.sync="series.netArea.interval.value"
+          :prop="'netArea.interval.value'"
+          @summit="summit(arguments)"
         >
-          <div slot="select">{{setItem.areaInterval}}</div>
+          <div slot="select">{{ setItem.areaInterval }}</div>
         </chart-base-select>
         <!-- 自定义间隔数 -->
         <chart-base-slider
@@ -256,16 +382,24 @@
           :baseSliderOption.sync="series.netArea.interval.cusNumber"
           :unit="'个'"
           :content="setItem.content12"
+          :prop="'netArea.interval.cusNumber'"
+          @summit="summit(arguments)"
         ></chart-base-slider>
 
-        <el-row style="margin-top: 15px;">
-          <el-col :span="6">{{setItem.area1}}</el-col>
+        <el-row style="margin-top: 15px">
+          <el-col :span="6">{{ setItem.area1 }}</el-col>
           <el-col :span="3">
-            <el-color-picker size="mini" v-model="series.netArea.colorOne"></el-color-picker>
+            <el-color-picker
+              size="mini"
+              v-model="series.netArea.colorOne"
+            ></el-color-picker>
           </el-col>
-          <el-col :span="6">{{setItem.area2}}</el-col>
+          <el-col :span="6">{{ setItem.area2 }}</el-col>
           <el-col :span="3">
-            <el-color-picker size="mini" v-model="series.netArea.colorTwo"></el-color-picker>
+            <el-color-picker
+              size="mini"
+              v-model="series.netArea.colorTwo"
+            ></el-color-picker>
           </el-col>
         </el-row>
       </div>
@@ -406,13 +540,24 @@ export default {
     },
   },
   methods: {
-    ...t.mapActions("chartSetting", ["updateChartItem"]),
+    ...t.mapActions("chartSetting", ["updateChartItem", "updateCurrentProp"]),
     changeAxis() {
+      let prop = {
+        prop: "axisPlace-" + this.axis.axisType + ':' + this.prop,
+        oldValue: this.oldVal,
+        value: this.curVal,
+      };
       const updateObj = {
         updateObj: t.deepCopy(this.series),
         router: this.router + "/" + this.axis.axisType,
       };
+      this.updateCurrentProp(prop);
       this.updateChartItem(updateObj);
+    },
+    summit(val) {
+      this.prop = val[0];
+      this.curVal = val[1];
+      this.oldVal = val[2];
     },
   },
 };

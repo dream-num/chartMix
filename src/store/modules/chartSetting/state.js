@@ -2754,5 +2754,10 @@ export default {
         index: ''
     },
     number: 0,  //记录更改设置项操作
-    renderView: false   // 如果走updateChart,更新store后不走renderChart
+    renderView: false,   // 如果走updateChart,更新store后不走renderChart
+    chartTypeInfo: {   //是否改变图表类型
+        isChangeType: false,
+        newVal: '',
+        oldVal: ''
+    }
 };

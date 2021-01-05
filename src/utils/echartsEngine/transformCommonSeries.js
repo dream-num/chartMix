@@ -201,7 +201,7 @@ const transformCommonSeries = function (chartAllTypeArray, seriesPlace, series, 
 
     setValue(prop, seriesPlace, value)
 
-    if (!prop.index) {
+    if (!props.index) {
         for (let i = 0; i < series.length; i++) {
             result = transform(prop, value, series[i])
             $.extend(true, series[i], result)

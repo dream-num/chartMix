@@ -1,7 +1,7 @@
 import store from '../store'
 import Vue from 'vue'
 import { generateRandomKey, deepCopy, getRowColCheck, getRangeSplitArray, getChartDataCache, getChartDataSeriesOrder, addDataToOption } from '../utils/util'
-import { changeChartRange , changeChartCellData , renderChart, updateChart, getDefaultJson, restoreChart } from '../utils/chartUtil'
+import { changeChartRange, changeChartCellData, renderChart, updateChart, getDefaultJson, restoreChart, changeChangeAllType } from '../utils/chartUtil'
 import { chartOptions } from '../data/chartJson'
 import echarts from 'echarts'
 import $ from 'jquery'
@@ -52,9 +52,9 @@ function createChart(render, chartData, chart_id, rangeArray, rangeTxt, chartThe
     // if (ratio > 5) {
     //     chartOptions.chartAllType = 'echarts|pie|default'
     // } else {
-        // chartOptions.chartAllType = 'echarts|line|default'
+    // chartOptions.chartAllType = 'echarts|line|default'
 
-        chartAllType = chartAllType ? chartAllType : 'echarts|line|default'
+    chartAllType = chartAllType ? chartAllType : 'echarts|line|default'
     // }
 
     // 生成图表数据结构
@@ -227,13 +227,13 @@ function resizeChart(chart_id) {
 
     if (chartPro == "echarts") {
         echarts.getInstanceById($("#" + chart_id).attr("_echarts_instance_")).resize();
-    } 
+    }
 }
 
-function resizeChartAll(){
-    for(let i = 0; i < ChartSetting.chartLists.length; i++){
+function resizeChartAll() {
+    for (let i = 0; i < ChartSetting.chartLists.length; i++) {
         let chartJson = ChartSetting.chartLists[i].chartOptions
-        if(chartJson.chartAllType.split('|')[0] == 'echarts'){
+        if (chartJson.chartAllType.split('|')[0] == 'echarts') {
             echarts.getInstanceById($('#' + chartJson.chart_id).attr('_echarts_instance_')).resize()
         }
     }
@@ -256,13 +256,18 @@ function deleteChart(chart_id) {
     return chart
 }
 
-function getChartJson(chart_id){
+function getChartJson(chart_id) {
     let index = ChartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
-    return  ChartSetting.chartLists[index].chartOptions;
+    return ChartSetting.chartLists[index].chartOptions;
 }
 
-function insertToStore(chart_json){
+function insertToStore(chart_json) {
     ChartSetting.chartLists.push(chart_json)
+}
+
+function changeChartType(chartAllType) {
+    let chartJson = ChartSetting.chartLists[ChartSetting.currentChartIndex].chartOptions
+    changeChangeAllType(chartJson, chartAllType)
 }
 
 export {
@@ -278,5 +283,6 @@ export {
     renderChart,
     insertToStore,
     updateChart,
-    restoreChart
+    restoreChart,
+    changeChartType
 }

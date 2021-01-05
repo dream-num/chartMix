@@ -8,6 +8,7 @@ export const UPDATE_PROP = 'UPDATE_PROP'
 export const UPDATE_RENDER_VIEW = 'UPDATE_RENDER_VIEW'
 export const UPDATE_CURRENT_PROP = 'UPDATE_CURRENT_PROP'
 export const ADD_PROP = 'ADD_PROP'
+export const UPDATE_CHART_TYPE = 'UPDATE_CHART_TYPE'
 
 export default {
     ENABLE_ACTIVE,
@@ -19,5 +20,6 @@ export default {
     UPDATE_PROP,
     UPDATE_RENDER_VIEW,
     UPDATE_CURRENT_PROP,
-    ADD_PROP
+    ADD_PROP,
+    UPDATE_CHART_TYPE
 }

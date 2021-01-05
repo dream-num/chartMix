@@ -685,8 +685,8 @@ export default {
         updateObj: t.deepCopy(this.seriesData),
         router: this.router,
       };
-      this.updateChartItem(updateObj);
       this.updateCurrentProp(prop)
+      this.updateChartItem(updateObj);
     },
     exType(){
       this.prop = 'type'

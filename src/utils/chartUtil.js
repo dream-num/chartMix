@@ -63,6 +63,7 @@ const renderChart = function (renderChartObj, ele) {
 
             console.dir(JSON.stringify(options))
             console.dir(options)
+            store.dispatch('chartSetting/updateChartType', { isChangeType: false })
 
             setTimeout(() => {
                 echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
@@ -88,8 +89,10 @@ const updateChart = function (props) {
         chart.setOption(options, true);
 
         chartOptions.defaultOption = options
+        store.state.chartSetting.prop.reverse = props.reverse
         store.dispatch('chartSetting/updateChartItemChartlist', chartOptions)
         store.dispatch('chartSetting/updateRenderView', true)
+        store.dispatch('chartSetting/updateChartType', { isChangeType: false })
 
         setTimeout(() => {
             echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
@@ -98,34 +101,34 @@ const updateChart = function (props) {
 }
 
 // 按操作步骤渲染图表
-const restoreChart = function(option){
+const restoreChart = function (option) {
     let chartOptions = option.chartOptions
     const chartAllTypeArray = chartOptions.chartAllType.split('|');
     const chartPro = chartAllTypeArray[0];
     const container = document.getElementById(option.chart_id);
 
-    if(option.props && option.props.length){
-        for(let i = 0; i < option.props.length; i++){
+    if (option.props && option.props.length) {
+        for (let i = 0; i < option.props.length; i++) {
             let options = echartsEngine(chartOptions, option.props[i]);
-    
+
             let chart = echarts.getInstanceByDom(container);
             if (chart == null) {
                 chart = echarts.init(container)
             }
-    
+
             chart.setOption(options, true);
-    
+
             chartOptions.defaultOption = options
             store.dispatch('chartSetting/updateChartItemChartlist', chartOptions)
             store.dispatch('chartSetting/updateRenderView', true)
-    
+
             setTimeout(() => {
                 echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
             }, 0);
         }
-    }else{
+    } else {
         let options = echartsEngine(chartOptions);
-    
+
         let chart = echarts.getInstanceByDom(container);
         if (chart == null) {
             chart = echarts.init(container)
@@ -314,6 +317,8 @@ const transCustom = function (a, b) {
 // changecharttype
 const changeChangeAllType = function (chart_json, chartAllType) {
     store.dispatch('chartSetting/updateRenderView', false)
+    // 清空prop
+    store.dispatch('chartSetting/updateCurrentProp', {})
 
     var chartID = chart_json.chart_id;
     var chart_id = chartID;

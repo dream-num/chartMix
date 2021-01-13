@@ -23,30 +23,30 @@ function transform(prefix, prop, value, titlePlace) {
             }
         }],
         ['label.fontGroup', () => {
-            let fontWeight,fontStyle
+            let fontWeight, fontStyle
             if (value.includes('bold')) {
-                if(prefix == 'titlePlace'){
+                if (prefix == 'titlePlace') {
                     fontWeight = getFullAttr(obj, 'textStyle.fontWeight', 'bold')
-                }else{
+                } else {
                     fontWeight = getFullAttr(obj, 'subtextStyle.fontWeight', 'bold')
                 }
-            }else{
-                if(prefix == 'titlePlace'){
+            } else {
+                if (prefix == 'titlePlace') {
                     fontWeight = getFullAttr(obj, 'textStyle.fontWeight', 'normal')
-                }else{
+                } else {
                     fontWeight = getFullAttr(obj, 'subtextStyle.fontWeight', 'normal')
                 }
             }
             if (value.includes('italic')) {
-                if(prefix == 'titlePlace'){
+                if (prefix == 'titlePlace') {
                     fontStyle = getFullAttr(obj, 'textStyle.fontStyle', 'italic')
-                }else{
+                } else {
                     fontStyle = getFullAttr(obj, 'subtextStyle.fontStyle', 'italic')
                 }
-            }else{
-                if(prefix == 'titlePlace'){
+            } else {
+                if (prefix == 'titlePlace') {
                     fontStyle = getFullAttr(obj, 'textStyle.fontStyle', 'normal')
-                }else{
+                } else {
                     fontStyle = getFullAttr(obj, 'subtextStyle.fontStyle', 'normal')
                 }
             }
@@ -54,16 +54,16 @@ function transform(prefix, prop, value, titlePlace) {
             $.extend(true, final, fontStyle, fontWeight)
         }],
         ['label.fontSize', () => {
-            if(prefix == 'titlePlace'){
+            if (prefix == 'titlePlace') {
                 final = getFullAttr(obj, 'textStyle.fontSize')
-            }else{
+            } else {
                 final = getFullAttr(obj, 'subtextStyle.fontSize')
             }
         }],
         ['label.color', () => {
-            if(prefix == 'titlePlace'){
+            if (prefix == 'titlePlace') {
                 final = getFullAttr(obj, 'textStyle.color')
-            }else{
+            } else {
                 final = getFullAttr(obj, 'subtextStyle.color')
             }
         }],
@@ -129,11 +129,11 @@ function getFullAttr(obj, attr, value) {
     return final
 }
 
-function setValue(attr, data, value){
-    if(attr.includes('.')){
+function setValue(attr, data, value) {
+    if (attr.includes('.')) {
         let arr = attr.split('.')
         repeat(data, arr)
-    }else{
+    } else {
         data[attr] = value
     }
 

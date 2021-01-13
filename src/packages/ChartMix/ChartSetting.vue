@@ -164,7 +164,7 @@
 
                   <!-- 鼠标提示组件 -->
                   <chart-cursor
-                    :router="'tooltip'"
+                    :router="'tooltipPlace'"
                     :chartAllType="currentChartType"
                     :cursorOption="cursorOption"
                     :lang="lang"
@@ -172,7 +172,7 @@
 
                   <!-- 图例组件 -->
                   <chart-legend
-                    :router="'legend'"
+                    :router="'legendPlace'"
                     :chartAllType="currentChartType"
                     :legendOption="legendOption"
                     :lang="lang"
@@ -256,10 +256,10 @@ export default {
     return {
       currentChartType: "echarts|line|default", //图表类型
       chart_id: '',
-      titleOption: deepCopy(chartComponent.title), //标题设置
-      subTitleOption: deepCopy(chartComponent.subtitle), //标题设置
-      cursorOption: deepCopy(chartComponent.tooltip), //鼠标提示设置
-      legendOption: deepCopy(chartComponent.legend), //图例设置
+      titleOption: deepCopy(chartComponent.titlePlace), //标题设置
+      subTitleOption: deepCopy(chartComponent.subtitlePlace), //标题设置
+      cursorOption: deepCopy(chartComponent.tooltipPlace), //鼠标提示设置
+      legendOption: deepCopy(chartComponent.legendPlace), //图例设置
       axisOption: deepCopy(chartComponent.axis), //坐标轴设置
       seriesOptionData: {},     //普通系列设置
       pieOptionData: {},     //饼图系列设置

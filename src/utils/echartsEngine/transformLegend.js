@@ -82,6 +82,8 @@ function transform(prop, value) {
         ['distace.cusGap', () => getAttr(obj, 'itemGap', final)]
     ])
 
+    console.dir(prop)
+    console.dir(action.get(prop))
     action.get(prop)()
 
     return final

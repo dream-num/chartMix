@@ -23,6 +23,8 @@ const setChartOptionsByRouter = function (chartOptions, router, updateObj) {
     //递归获取内部属性
     function deepFind(curObj) {
         if (routerArray.length != 0) {
+            console.dir(curObj)
+            console.dir('111' + routerArray)
             return deepFind(curObj[routerArray.shift()])
         } else {
             Object.assign(curObj, updateObj)

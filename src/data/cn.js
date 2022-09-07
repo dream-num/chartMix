@@ -5,8 +5,8 @@ let obj = {
         transpose: '转置(切换行/列)',
         row1: '设选中项第',
         row2: '行为标题',
-        column: '设选中项第',
-        column: '列为标题',
+        column1: '设选中项第',
+        column2: '列为标题',
         style: '样式',
         echarts: {
             line: {

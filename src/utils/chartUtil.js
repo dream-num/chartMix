@@ -1,9 +1,15 @@
-import { getChartDataCache,getRowColCheck, getRangeSplitArray, getChartDataSeriesOrder, addDataToOption, deepCopy } from '../utils/util'
-import echartsEngine from '@/utils/echartsEngine/index'
-import store from '../store'
+import {
+    getChartDataCache,
+    getRowColCheck,
+    getRangeSplitArray,
+    getChartDataSeriesOrder,
+    addDataToOption,
+    deepCopy,
+} from "../utils/util";
+import echartsEngine from "@/utils/echartsEngine/index";
+import store from "../store";
 // import highchartsEngine from './highchartsEngine'
-const echarts = require('echarts');
-
+const echarts = require("echarts");
 
 /**
  * update main object's subject attribute by router
@@ -16,84 +22,83 @@ const setChartOptionsByRouter = function (chartOptions, router, updateObj) {
         return chartOptions;
     }
 
-    let routerArray = router.split('/');
+    let routerArray = router.split("/");
     const defaultOption = chartOptions.defaultOption;
 
     //递归获取内部属性
     function deepFind(curObj) {
         if (routerArray.length != 0) {
-            return deepFind(curObj[routerArray.shift()])
+            return deepFind(curObj[routerArray.shift()]);
         } else {
-            Object.assign(curObj, updateObj)
-            return curObj
+            Object.assign(curObj, updateObj);
+            return curObj;
         }
-
     }
     deepFind(defaultOption);
-    renderChart({chartOptions: chartOptions})
+    renderChart({ chartOptions: chartOptions });
     return chartOptions;
-}
+};
 
 /**
  * 渲染图表的方法,拿到store的配置json(对应于chartJson中的数据格式,可能是初始化图表的数据,也可能是后台传输来的特定配置的数据),执行转换引擎后,渲染到图表插件中,独立于vue组件.可用于编辑器和预览端
- * 
+ *
  */
 const renderChart = function (renderChartObj, ele) {
-    let chartOptions = renderChartObj.chartOptions
-    let chart_id = chartOptions.chart_id
+    let chartOptions = renderChartObj.chartOptions;
+    let chart_id = chartOptions.chart_id;
     // const { chart_id, chartOptions } = renderChartObj;
-    const chartAllTypeArray = chartOptions.chartAllType.split('|');
+    const chartAllTypeArray = chartOptions.chartAllType.split("|");
     const chartPro = chartAllTypeArray[0];
     // const container = ele || document.getElementById(chart_id);
     const container = document.getElementById(chart_id);
+    if (!container) return;
 
-    if (chartPro === 'echarts') {
+    if (chartPro === "echarts") {
         const options = echartsEngine(chartOptions);
 
         let chart = echarts.getInstanceByDom(container);
         if (chart == null) {
-            chart = echarts.init(container)
+            chart = echarts.init(container);
         }
 
         chart.setOption(options, true);
 
         setTimeout(() => {
-            echarts.getInstanceById(container.getAttribute('_echarts_instance_')).resize();
+            echarts.getInstanceById(container.getAttribute("_echarts_instance_")).resize();
         }, 0);
     }
-}
+};
 
 /**
  * textStyle转化
  */
 const transTextStyle = function (origin, result, attr, attr1) {
     // fontGroup
-    let fontGroupList = ['bold', 'vertical', 'italic'];
-    origin.label.fontGroup.forEach(element => {
+    let fontGroupList = ["bold", "vertical", "italic"];
+    origin.label.fontGroup.forEach((element) => {
         if (fontGroupList.includes(element)) {
             switch (element) {
-                case 'bold':
+                case "bold":
                     result[attr].fontWeight = element;
                     break;
-                case 'vertical':
+                case "vertical":
                     // TODO: '标题01'
-                    result[attr1] = origin.text.replace(/\B/g, '\n');
+                    result[attr1] = origin.text.replace(/\B/g, "\n");
                     break;
-                case 'italic':
+                case "italic":
                     result[attr].fontStyle = element;
                     break;
             }
         }
     });
     // fontColor
-    result[attr].color = origin.label.color
+    result[attr].color = origin.label.color;
     // fontSize
-    result[attr].fontSize = transCustom(origin.label.fontSize, origin.label.cusFontSize)
-}
+    result[attr].fontSize = transCustom(origin.label.fontSize, origin.label.cusFontSize);
+};
 
 // 解决精度
-const floatTool = function () {
-
+const floatTool = (function () {
     /*
      * 判断obj是否为一个整数
      */
@@ -115,8 +120,8 @@ const floatTool = function () {
             return ret;
         }
 
-        var strfi = floatNum + '';
-        var dotPos = strfi.indexOf('.');
+        var strfi = floatNum + "";
+        var dotPos = strfi.indexOf(".");
         var len = strfi.substr(dotPos + 1).length;
         var times = Math.pow(10, len);
         var intNum = parseInt(floatNum * times + 0.5, 10);
@@ -148,55 +153,54 @@ const floatTool = function () {
         var result = null;
 
         switch (op) {
-            case 'add':
-                if (t1 === t2) { // 两个小数位数相同
+            case "add":
+                if (t1 === t2) {
+                    // 两个小数位数相同
                     result = n1 + n2;
-                }
-                else if (t1 > t2) { // o1 小数位 大于 o2
+                } else if (t1 > t2) {
+                    // o1 小数位 大于 o2
                     result = n1 + n2 * (t1 / t2);
-                }
-                else { // o1 小数位 小于 o2
+                } else {
+                    // o1 小数位 小于 o2
                     result = n1 * (t2 / t1) + n2;
                 }
 
                 return result / max;
-            case 'subtract':
+            case "subtract":
                 if (t1 === t2) {
                     result = n1 - n2;
-                }
-                else if (t1 > t2) {
+                } else if (t1 > t2) {
                     result = n1 - n2 * (t1 / t2);
-                }
-                else {
+                } else {
                     result = n1 * (t2 / t1) - n2;
                 }
 
                 return result / max;
-            case 'multiply':
+            case "multiply":
                 result = (n1 * n2) / (t1 * t2);
 
                 return result;
-            case 'divide':
-                return result = function () {
+            case "divide":
+                return (result = (function () {
                     var r1 = n1 / n2;
                     var r2 = t2 / t1;
-                    return operation(r1, r2, 'multiply');
-                }();
+                    return operation(r1, r2, "multiply");
+                })());
         }
     }
 
     // 加减乘除的四个接口
     function add(a, b) {
-        return operation(a, b, 'add');
+        return operation(a, b, "add");
     }
     function subtract(a, b) {
-        return operation(a, b, 'subtract');
+        return operation(a, b, "subtract");
     }
     function multiply(a, b) {
-        return operation(a, b, 'multiply');
+        return operation(a, b, "multiply");
     }
     function divide(a, b) {
-        return operation(a, b, 'divide');
+        return operation(a, b, "divide");
     }
 
     // exports
@@ -204,31 +208,31 @@ const floatTool = function () {
         add: add,
         subtract: subtract,
         multiply: multiply,
-        divide: divide
+        divide: divide,
     };
-}();
+})();
 
 /**
  * lineStyle转化
  */
-const transLineStyle = function (width, color, type = 'solid') {
+const transLineStyle = function (width, color, type = "solid") {
     return {
         width,
         color,
-        type
-    }
-}
+        type,
+    };
+};
 
 /**
  自定义* custom数据
  */
 const transCustom = function (a, b) {
-    if (a != 'custom') {
-        return a
+    if (a != "custom") {
+        return a;
     } else {
-        return b
+        return b;
     }
-}
+};
 
 // changecharttype
 const changeChangeAllType = function (chart_json, chartAllType) {
@@ -246,8 +250,8 @@ const changeChangeAllType = function (chart_json, chartAllType) {
     updateJson.chartAllType = chartAllType;
 
     //按照图表类型得到图表的默认设置
-    var defaultOptionIni = chart_json.defaultOption
-    defaultOptionIni.series = []
+    var defaultOptionIni = chart_json.defaultOption;
+    defaultOptionIni.series = [];
 
     //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
     var chartDataCache = getChartDataCache(
@@ -255,15 +259,13 @@ const changeChangeAllType = function (chart_json, chartAllType) {
         chart_json.rangeSplitArray,
         chartPro,
         chartType,
-        chartStyle
+        chartStyle,
     );
     // console.dir(chartDataCache)
     updateJson.chartDataCache = chartDataCache;
 
     //生成默认的系列顺序，默认根据series数组的位置，用户可以在界面上操作更改这个位置。
-    var chartDataSeriesOrder = getChartDataSeriesOrder(
-        chartDataCache.series[0].length
-    );
+    var chartDataSeriesOrder = getChartDataSeriesOrder(chartDataCache.series[0].length);
     updateJson.chartDataSeriesOrder = chartDataSeriesOrder;
 
     //根据图表的默认设置、图表数据、图表系列顺序，等到一个完整的图表配置串。
@@ -274,33 +276,33 @@ const changeChangeAllType = function (chart_json, chartAllType) {
         chartPro,
         chartType,
         chartStyle,
-        chart_json.chartData
+        chart_json.chartData,
     );
 
     updateJson.defaultOption = defaultOption;
 
-    store.dispatch('chartSetting/updateChartItemChartlist', updateJson)
+    store.dispatch("chartSetting/updateChartItemChartlist", updateJson);
 
-    renderChart({ chartOptions: updateJson, chart_id: chart_id })
-}
+    renderChart({ chartOptions: updateJson, chart_id: chart_id });
+};
 
 // 行/列标题操作以及转置操作
 const checkCurrentBoxChange = function (chart_id, rangeRowCheck, rangeColCheck, rangeConfigCheck) {
     var state = store.state;
 
-    var updateJson = deepCopy(state.chartSetting.chartLists[state.chartSetting.currentChartIndex].chartOptions) //原来的json
+    var updateJson = deepCopy(state.chartSetting.chartLists[state.chartSetting.currentChartIndex].chartOptions); //原来的json
     updateJson.chart_id = chart_id;
     updateJson.rangeRowCheck = rangeRowCheck;
     updateJson.rangeColCheck = rangeColCheck;
     updateJson.rangeConfigCheck = rangeConfigCheck;
 
-    updateJson.chartData = updateJson.chartData || []
+    updateJson.chartData = updateJson.chartData || [];
 
     updateJson.rangeSplitArray = getRangeSplitArray(
         updateJson.chartData,
         updateJson.rangeArray,
         rangeColCheck,
-        rangeRowCheck
+        rangeRowCheck,
     );
 
     var chartAllTypeArray = updateJson.chartAllType.split("|");
@@ -314,11 +316,9 @@ const checkCurrentBoxChange = function (chart_id, rangeRowCheck, rangeColCheck, 
         chartPro,
         chartType,
         chartStyle,
-        rangeConfigCheck
+        rangeConfigCheck,
     ); //处理转置
-    updateJson.chartDataSeriesOrder = getChartDataSeriesOrder(
-        updateJson.chartDataCache.series[0].length
-    );
+    updateJson.chartDataSeriesOrder = getChartDataSeriesOrder(updateJson.chartDataCache.series[0].length);
 
     updateJson.defaultOption = addDataToOption(
         updateJson.defaultOption,
@@ -326,13 +326,13 @@ const checkCurrentBoxChange = function (chart_id, rangeRowCheck, rangeColCheck, 
         updateJson.chartDataSeriesOrder,
         chartPro,
         chartType,
-        chartStyle
-    )
+        chartStyle,
+    );
 
-    store.dispatch('chartSetting/updateChartItemChartlist', updateJson)
+    store.dispatch("chartSetting/updateChartItemChartlist", updateJson);
 
-    renderChart({ chartOptions: updateJson, chart_id: chart_id })
-}
+    renderChart({ chartOptions: updateJson, chart_id: chart_id });
+};
 
 //系列数据顺序变化
 const changeSeriesOrder = function (chart_json, chartDataSeriesOrder) {
@@ -353,23 +353,18 @@ const changeSeriesOrder = function (chart_json, chartDataSeriesOrder) {
         chartDataSeriesOrder,
         chartPro,
         chartType,
-        chartStyle
+        chartStyle,
     );
 
-    store.dispatch('chartSetting/updateChartItemChartlist', chart_json)
-    renderChart({ chartOptions: chart_json, chart_id: chart_id })
-}
+    store.dispatch("chartSetting/updateChartItemChartlist", chart_json);
+    renderChart({ chartOptions: chart_json, chart_id: chart_id });
+};
 
-function changeChartRange(
-    chart_id,
-    chartData,
-    rangeArray,
-    rangeTxt
-) {
-    let index = store.state.chartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
-    store.state.chartSetting.currentChartIndex = index
+function changeChartRange(chart_id, chartData, rangeArray, rangeTxt) {
+    let index = store.state.chartSetting.chartLists.findIndex((item) => item.chart_id == chart_id);
+    store.state.chartSetting.currentChartIndex = index;
 
-    var chart_json = store.state.chartSetting.chartLists[index].chartOptions
+    var chart_json = store.state.chartSetting.chartLists[index].chartOptions;
 
     var chartAllType = chart_json.chartAllType;
 
@@ -398,28 +393,15 @@ function changeChartRange(
     chart_json.rangeConfigCheck = rangeConfigCheck;
 
     //按照数据范围文字得到具体数据范围
-    var rangeSplitArray = getRangeSplitArray(
-        chartData,
-        rangeArray,
-        rangeColCheck,
-        rangeRowCheck
-    );
+    var rangeSplitArray = getRangeSplitArray(chartData, rangeArray, rangeColCheck, rangeRowCheck);
     chart_json.rangeSplitArray = rangeSplitArray;
 
     //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
-    var chartDataCache = getChartDataCache(
-        chartData,
-        rangeSplitArray,
-        chartPro,
-        chartType,
-        chartStyle
-    );
+    var chartDataCache = getChartDataCache(chartData, rangeSplitArray, chartPro, chartType, chartStyle);
     chart_json.chartDataCache = chartDataCache;
 
     //生成默认的系列顺序，默认根据series数组的位置，用户可以在界面上操作更改这个位置。
-    var chartDataSeriesOrder = getChartDataSeriesOrder(
-        chartDataCache.series[0].length
-    );
+    var chartDataSeriesOrder = getChartDataSeriesOrder(chartDataCache.series[0].length);
     chart_json.chartDataSeriesOrder = chartDataSeriesOrder;
 
     var defaultOptionIni = chart_json.defaultOption;
@@ -433,21 +415,20 @@ function changeChartRange(
         chartType,
         chartStyle,
         true,
-        chartData
-    )
+        chartData,
+    );
 
     chart_json.defaultOption = defaultOption;
 
-    store.dispatch('chartSetting/updateChartItemChartlist', chart_json)
-    renderChart({ chartOptions: chart_json, chart_id: chart_id })
+    store.dispatch("chartSetting/updateChartItemChartlist", chart_json);
+    renderChart({ chartOptions: chart_json, chart_id: chart_id });
 }
 
 function changeChartCellData(chart_id, chartData) {
+    let index = store.state.chartSetting.chartLists.findIndex((item) => item.chart_id == chart_id);
+    store.state.chartSetting.currentChartIndex = index;
 
-    let index = store.state.chartSetting.chartLists.findIndex(item => item.chart_id == chart_id)
-    store.state.chartSetting.currentChartIndex = index
-
-    var chart_json = store.state.chartSetting.chartLists[index].chartOptions
+    var chart_json = store.state.chartSetting.chartLists[index].chartOptions;
 
     var chartAllType = chart_json.chartAllType;
 
@@ -464,28 +445,15 @@ function changeChartCellData(chart_id, chartData) {
     var rangeColCheck = chart_json.rangeColCheck;
 
     //按照数据范围文字得到具体数据范围
-    var rangeSplitArray = getRangeSplitArray(
-        chartData,
-        chart_json.rangeArray,
-        rangeColCheck,
-        rangeRowCheck
-    );
+    var rangeSplitArray = getRangeSplitArray(chartData, chart_json.rangeArray, rangeColCheck, rangeRowCheck);
     chart_json.rangeSplitArray = rangeSplitArray;
 
     //根据数据集、功能按钮状态、图表类型，得到图表可操作的数据格式，例如：{ "x":[], "y":[], series:[] }，可以按照次格式渲染数据页中的系列和轴控件。
-    var chartDataCache = getChartDataCache(
-        chartData,
-        rangeSplitArray,
-        chartPro,
-        chartType,
-        chartStyle
-    );
+    var chartDataCache = getChartDataCache(chartData, rangeSplitArray, chartPro, chartType, chartStyle);
     chart_json.chartDataCache = chartDataCache;
 
     //��成默认的系列顺序，默认根据series数组的位置，用户可以在界面上操作更改这个位置。
-    var chartDataSeriesOrder = getChartDataSeriesOrder(
-        chartDataCache.series[0].length
-    );
+    var chartDataSeriesOrder = getChartDataSeriesOrder(chartDataCache.series[0].length);
     chart_json.chartDataSeriesOrder = chartDataSeriesOrder;
 
     var defaultOptionIni = chart_json.defaultOption;
@@ -500,13 +468,13 @@ function changeChartCellData(chart_id, chartData) {
         chartType,
         chartStyle,
         true,
-        chartData
-    )
+        chartData,
+    );
 
     chart_json.defaultOption = defaultOption;
 
-    store.dispatch('chartSetting/updateChartItemChartlist', chart_json)
-    renderChart({ chartOptions: chart_json, chart_id: chart_id })
+    store.dispatch("chartSetting/updateChartItemChartlist", chart_json);
+    renderChart({ chartOptions: chart_json, chart_id: chart_id });
 }
 
 export {
@@ -520,5 +488,5 @@ export {
     checkCurrentBoxChange,
     changeSeriesOrder,
     changeChartRange,
-    changeChartCellData
-}
+    changeChartCellData,
+};
